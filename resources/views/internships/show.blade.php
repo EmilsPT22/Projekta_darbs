@@ -15,10 +15,13 @@
         <li><strong>End Date:</strong> {{ \Carbon\Carbon::parse($internship->end_date)->format('d/m/Y') }}</li>
     </ul>
 
+
     <h2>Students:</h2>
     <ul>
     @foreach($users as $user)
-        <li>{{ $user->name }} ({{ $user->email }})</li>
+        <li>{{ $user->name }} ({{ $user->email }})
+            <button type="submit">Add</button>
+        </li>
     @endforeach
     </ul>
 
