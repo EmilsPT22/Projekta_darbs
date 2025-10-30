@@ -4,19 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\Internship;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class InternshipController extends Controller
 {
     public function index()
     {
         $internships = Internship::all();
-        return view('internships.index', compact('internships'));
+        return view('internships.index', ['internships' => $internships]);
     }
+
 
     public function create()
     {
         return view('internships.create');
     }
+
 
     public function store(Request $request)
     {
@@ -35,12 +38,14 @@ class InternshipController extends Controller
 
     public function show(Internship $internship)
     {
-        return view('internships.show', compact('internship'));
+        $users = User::all();
+
+        return view('internships.show', ['internship' => $internship, 'users' => $users]);
     }
 
     public function edit(Internship $internship)
     {
-        return view('internships.edit', compact('internship'));
+        return view('internships.edit', ['internship' => $internship]);
     }
 
     public function update(Request $request, Internship $internship)

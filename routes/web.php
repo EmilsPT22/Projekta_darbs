@@ -10,6 +10,7 @@ Route::get('/', function () {
 use App\Http\Controllers\InternshipController;
 
 Route::resource('internships', InternshipController::class);
+Route::post('internships/{internship}/addStudent/{student}', [InternshipController::class, 'addStudent'])->name('internships.addStudent');
 
 
 Route::get('/dashboard', function () {

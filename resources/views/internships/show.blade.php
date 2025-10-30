@@ -15,6 +15,13 @@
         <li><strong>End Date:</strong> {{ \Carbon\Carbon::parse($internship->end_date)->format('d/m/Y') }}</li>
     </ul>
 
+    <h2>Students:</h2>
+    <ul>
+    @foreach($users as $user)
+        <li>{{ $user->name }} ({{ $user->email }})</li>
+    @endforeach
+    </ul>
+
     <a href="{{ route('internships.index') }}">Back to Internships</a>
 </body>
 </html>
