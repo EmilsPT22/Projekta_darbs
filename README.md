@@ -12,7 +12,7 @@
 <li> <code>composer install</code></li> 
 <li><code>cp .env.example .env</code> </li> 
 <li><code>php artisan migrate</code></li> 
-<li><code>php artisan db:seed --class=DatabaseSeeder </li>
-<li> <code>php artisan serve</code></li>
-<ol>
+<li><code>php artisan db:seed --class=DatabaseSeeder</code></li>
+<li><code>php artisan serve</code></li>
+</ol>
 </div>
