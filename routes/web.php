@@ -2,15 +2,17 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\InternshipController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-use App\Http\Controllers\InternshipController;
+
 
 Route::resource('internships', InternshipController::class);
-Route::post('internships/{internship}/addStudent/{student}', [InternshipController::class, 'addStudent'])->name('internships.addStudent');
+Route::post('internships/{internship}/addStudent/{id}', [InternshipController::class, 'addStudent'])->name('internships.addStudent');
+
 
 
 Route::get('/dashboard', function () {

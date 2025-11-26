@@ -17,4 +17,11 @@ class Internship extends Model
         'end_date'
     ];
 
+public function students()
+{
+    return $this->belongsToMany(User::class);
+}
+
+
+
 }

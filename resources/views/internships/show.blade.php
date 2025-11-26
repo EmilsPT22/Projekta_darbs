@@ -16,14 +16,36 @@
     </ul>
 
 
-    <h2>Students:</h2>
-    <ul>
-    @foreach($users as $user)
-        <li>{{ $user->name }} ({{ $user->email }})
-            <button type="submit">Add</button>
-        </li>
-    @endforeach
-    </ul>
+        <h2>Added Students</h2>
+        @if($addedStudents->isEmpty())
+            <p>No students added yet.</p>
+        @else
+            <ul>
+                @foreach($addedStudents as $student)
+                    <li>{{ $student->name }} ({{ $student->email }})</li>
+                @endforeach
+            </ul>
+        @endif
+
+
+        <h2>Add Students</h2>
+        @if($users->isEmpty())
+            <p>All students have been added.</p>
+        @else
+            <ul>
+                @foreach($users as $user)
+                    <li>
+                        {{ $user->name }} ({{ $user->email }})
+                        <form action="{{ route('internships.addStudent', ['internship' => $internship->id, 'id' => $user->id]) }}" 
+                            method="POST" style="display:inline;">
+                            @csrf
+                            <button type="submit">Add</button>
+                        </form>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+
 
     <a href="{{ route('internships.index') }}">Back to Internships</a>
 </body>

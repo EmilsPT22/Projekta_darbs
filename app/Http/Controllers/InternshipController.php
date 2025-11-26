@@ -37,11 +37,16 @@ class InternshipController extends Controller
     }
 
     public function show(Internship $internship)
-    {
-        $users = User::all();
+{
+    $addedStudents = $internship->students;
+    $users = User::whereNotIn('id', $addedStudents->pluck('id'))->get();
 
-        return view('internships.show', ['internship' => $internship, 'users' => $users]);
-    }
+    return view('internships.show', [
+        'internship' => $internship,
+        'users' => $users,
+        'addedStudents' => $addedStudents
+    ]);
+}
 
     public function edit(Internship $internship)
     {
@@ -69,4 +74,19 @@ class InternshipController extends Controller
 
         return redirect()->route('internships.index')->with('success', 'Internship deleted successfully');
     }
+
+
+    public function addStudent(Internship $internship, $id)
+    {
+        $student = User::findOrFail($id);
+
+        if ($internship->students()->where('user_id', $id)->exists()) {
+            return back()->with('error', 'This student is already added.');
+        }
+
+        $internship->students()->attach($id);
+
+        return back()->with('success', 'Student added successfully.');
+    }
+
 }
