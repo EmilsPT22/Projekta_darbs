@@ -12,6 +12,7 @@ Route::get('/', function () {
 
 Route::resource('internships', InternshipController::class);
 Route::post('internships/{internship}/addStudent/{id}', [InternshipController::class, 'addStudent'])->name('internships.addStudent');
+Route::delete('internships/{internship}/removeStudent/{id}', [InternshipController::class, 'removeStudent'])->name('internships.removeStudent');
 
 
 

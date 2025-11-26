@@ -89,4 +89,18 @@ class InternshipController extends Controller
         return back()->with('success', 'Student added successfully.');
     }
 
+        public function removeStudent(Internship $internship, $id)
+    {
+        $student = User::findOrFail($id);
+
+        if (!$internship->students()->where('user_id', $id)->exists()) {
+            return back()->with('error', 'Student is not attached to this internship.');
+        }
+
+        $internship->students()->detach($id);
+
+        return back()->with('success', 'Student removed successfully.');
+    }
+
+
 }

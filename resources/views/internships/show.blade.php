@@ -15,17 +15,26 @@
         <li><strong>End Date:</strong> {{ \Carbon\Carbon::parse($internship->end_date)->format('d/m/Y') }}</li>
     </ul>
 
-
         <h2>Added Students</h2>
         @if($addedStudents->isEmpty())
             <p>No students added yet.</p>
         @else
             <ul>
                 @foreach($addedStudents as $student)
-                    <li>{{ $student->name }} ({{ $student->email }})</li>
+                    <li>
+                        {{ $student->name }} ({{ $student->email }})
+
+                        <form action="{{ route('internships.removeStudent', ['internship' => $internship->id, 'id' => $student->id]) }}" 
+                            method="POST" style="display:inline;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit">Remove</button>
+                        </form>
+                    </li>
                 @endforeach
             </ul>
         @endif
+
 
 
         <h2>Add Students</h2>
