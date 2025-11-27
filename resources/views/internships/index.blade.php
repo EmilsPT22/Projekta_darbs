@@ -1,32 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Internships</title>
-</head>
-<body>
-    <h1>Internships</h1>
+@extends('layouts.app')
 
-    <!-- Success Message -->
-    @if(session('success'))
-        <p style="color: green;">{{ session('success') }}</p>
-    @endif
+@section('content')
+    <div class="container">
+        <h1 class="mb-4">Internships</h1>
 
-    <a href="{{ route('internships.create') }}">Create Internship</a>
+        @if(session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
 
-    <ul>
-        @foreach($internships as $internship)
-            <li>
-                {{ $internship->name }} - {{ $internship->start_date }} to {{ $internship->end_date }}
-                <a href="{{ route('internships.show', $internship) }}">View</a>
-                <a href="{{ route('internships.edit', $internship) }}">Edit</a>
-                <form action="{{ route('internships.destroy', $internship) }}" method="POST" style="display:inline;">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" onclick="return confirm('Are you sure you want to delete this internship?')">Delete</button>
-                </form>
-            </li>
-        @endforeach
-    </ul>
-</body>
-</html>
+        <a href="{{ route('internships.create') }}" class="btn btn-primary mb-3">Create Internship</a>
+
+        <ul class="list-group">
+            @foreach($internships as $internship)
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ $internship->name }}</strong><br>
+                        <small>{{ $internship->start_date }} to {{ $internship->end_date }}</small>
+                    </div>
+
+                    <div>
+                        <a href="{{ route('internships.show', $internship) }}" class="btn btn-info btn-sm">View</a>
+                        <a href="{{ route('internships.edit', $internship) }}" class="btn btn-warning btn-sm">Edit</a>
+
+                        <form action="{{ route('internships.destroy', $internship) }}" method="POST" style="display:inline;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" onclick="return confirm('Are you sure you want to delete this internship?')" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </div>
+                </li>
+            @endforeach
+        </ul>
+    </div>
+@endsection

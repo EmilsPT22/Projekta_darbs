@@ -1,3 +1,30 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+body {
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.navbar {
+    background-color: #007bff;
+}
+
+.navbar .navbar-brand {
+    font-weight: bold;
+}
+
+a {
+    color: #007bff;
+}
+
+a:hover {
+    color: #0056b3;
+}
+
+.btn-custom {
+    background-color: #28a742;
+    color: white;
+}
+
+.btn-custom:hover {
+    background-color: #218838;
+    color: white;
+}
