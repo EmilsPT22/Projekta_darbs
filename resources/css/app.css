@@ -1,5 +1,5 @@
 body {
-    background-color: #f8f9fa;
+    background-color: #ffffff;
     color: #333;
 }
 
@@ -21,10 +21,10 @@ a:hover {
 
 .btn-custom {
     background-color: #28a742;
-    color: white;
+    color: rgb(238, 238, 238);
 }
 
 .btn-custom:hover {
     background-color: #218838;
-    color: white;
+    color: rgb(255, 255, 255);
 }
