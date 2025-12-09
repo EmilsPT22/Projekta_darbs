@@ -16,69 +16,36 @@
         @csrf
 
         <div class="form-group mb-3">
-            <label for="name">Name</label>
-            <input
-                type="text"
-                name="name"
-                id="name"
-                value="{{ old('name') }}"
-                class="form-control"
-                required
-            >
+            <label>Name</label>
+            <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
         </div>
 
         <div class="form-group mb-3">
-            <label for="description">Description</label>
-            <textarea
-                name="description"
-                id="description"
-                class="form-control"
-                required
-            >{{ old('description') }}</textarea>
+            <label>Description</label>
+            <textarea name="description" class="form-control" required>{{ old('description') }}</textarea>
         </div>
 
         <div class="form-group mb-3">
-            <label for="length">Length (months)</label>
-            <input
-                type="number"
-                name="length"
-                id="length"
-                value="{{ old('length') }}"
-                class="form-control"
-                required
-            >
+            <label>Length (months)</label>
+            <input type="number" name="length" class="form-control" value="{{ old('length') }}" required>
         </div>
 
         <div class="form-group mb-3">
-            <label for="start_date">Start Date</label>
-            <input
-                type="date"
-                name="start_date"
-                id="start_date"
-                value="{{ old('start_date') }}"
-                class="form-control"
-                required
-            >
+            <label>Start Date</label>
+            <input type="date" name="start_date" class="form-control" value="{{ old('start_date') }}" required>
         </div>
 
         <div class="form-group mb-3">
-            <label for="end_date">End Date</label>
-            <input
-                type="date"
-                name="end_date"
-                id="end_date"
-                value="{{ old('end_date') }}"
-                class="form-control"
-                required
-            >
+            <label>End Date</label>
+            <input type="date" name="end_date" class="form-control" value="{{ old('end_date') }}" required>
         </div>
 
-        <button type="submit" class="btn btn-primary">Create</button>
+        <button class="btn btn-primary">Create</button>
     </form>
 </div>
+@endsection
 
-
+@section('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-
 @endsection

@@ -14,15 +14,16 @@ class InternshipController extends Controller
         return view('internships.index', ['internships' => $internships]);
     }
 
-
     public function create()
     {
+        $this->authorizeAdmin();
         return view('internships.create');
     }
 
-
     public function store(Request $request)
     {
+        $this->authorizeAdmin();
+
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
@@ -37,24 +38,29 @@ class InternshipController extends Controller
     }
 
     public function show(Internship $internship)
-{
-    $addedStudents = $internship->students;
-    $users = User::whereNotIn('id', $addedStudents->pluck('id'))->get();
+    {
+        $addedStudents = $internship->students;
+        $users = User::where('role', 'student')
+            ->whereNotIn('id', $addedStudents->pluck('id'))
+            ->get();
 
-    return view('internships.show', [
-        'internship' => $internship,
-        'users' => $users,
-        'addedStudents' => $addedStudents
-    ]);
-}
+        return view('internships.show', [
+            'internship' => $internship,
+            'users' => $users,
+            'addedStudents' => $addedStudents
+        ]);
+    }
 
     public function edit(Internship $internship)
     {
+        $this->authorizeAdmin();
         return view('internships.edit', ['internship' => $internship]);
     }
 
     public function update(Request $request, Internship $internship)
     {
+        $this->authorizeAdmin();
+
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
@@ -70,14 +76,16 @@ class InternshipController extends Controller
 
     public function destroy(Internship $internship)
     {
+        $this->authorizeAdmin();
         $internship->delete();
 
         return redirect()->route('internships.index')->with('success', 'Internship deleted successfully');
     }
 
-
     public function addStudent(Internship $internship, $id)
     {
+        $this->authorizeAdmin();
+
         $student = User::findOrFail($id);
 
         if ($internship->students()->where('user_id', $id)->exists()) {
@@ -89,8 +97,10 @@ class InternshipController extends Controller
         return back()->with('success', 'Student added successfully.');
     }
 
-        public function removeStudent(Internship $internship, $id)
+    public function removeStudent(Internship $internship, $id)
     {
+        $this->authorizeAdmin();
+
         $student = User::findOrFail($id);
 
         if (!$internship->students()->where('user_id', $id)->exists()) {
@@ -102,5 +112,10 @@ class InternshipController extends Controller
         return back()->with('success', 'Student removed successfully.');
     }
 
-
+    private function authorizeAdmin()
+    {
+        if (auth()->user()->role !== 'admin') {
+            abort(403);
+        }
+    }
 }

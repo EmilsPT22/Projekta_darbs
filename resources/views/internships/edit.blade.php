@@ -17,36 +17,36 @@
         @method('PUT')
 
         <div class="mb-3">
-            <label for="name" class="form-label">Name:</label>
-            <input type="text" name="name" value="{{ old('name', $internship->name) }}" class="form-control" required>
+            <label>Name</label>
+            <input type="text" name="name" class="form-control" value="{{ old('name', $internship->name) }}" required>
         </div>
 
         <div class="mb-3">
-            <label>Description:</label>
+            <label>Description</label>
             <textarea name="description" class="form-control" required>{{ old('description', $internship->description) }}</textarea>
         </div>
 
         <div class="mb-3">
-            <label>Length (months):</label>
-            <input type="number" name="length" value="{{ old('length', $internship->length) }}" class="form-control" required>
+            <label>Length (months)</label>
+            <input type="number" name="length" class="form-control" value="{{ old('length', $internship->length) }}" required>
         </div>
 
         <div class="mb-3">
-            <label>Start Date:</label>
-            <input type="date" name="start_date" value="{{ old('start_date', $internship->start_date) }}" class="form-control" required>
+            <label>Start Date</label>
+            <input type="date" name="start_date" class="form-control" value="{{ old('start_date', $internship->start_date) }}" required>
         </div>
 
         <div class="mb-3">
-            <label>End Date:</label>
-            <input type="date" name="end_date" value="{{ old('end_date', $internship->end_date) }}" class="form-control" required>
+            <label>End Date</label>
+            <input type="date" name="end_date" class="form-control" value="{{ old('end_date', $internship->end_date) }}" required>
         </div>
 
         <button class="btn btn-primary">Update</button>
     </form>
 </div>
+@endsection
 
-
+@section('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-
 @endsection
