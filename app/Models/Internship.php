@@ -14,14 +14,22 @@ class Internship extends Model
         'description',
         'length',
         'start_date',
-        'end_date'
+        'end_date',
     ];
 
-public function students()
-{
-    return $this->belongsToMany(User::class);
-}
+    public function students()
+    {
+        return $this->belongsToMany(User::class);
+    }
 
-
+    public function dailyEntries()
+    {
+        return $this->hasMany(DailyEntry::class);
+    }
+    
+    public function themes()
+    {
+        return $this->hasMany(Theme::class);
+    }
 
 }

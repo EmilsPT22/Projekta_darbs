@@ -23,6 +23,12 @@
                 <div>
                     <a href="{{ route('internships.show', $internship) }}" class="btn btn-info btn-sm">View</a>
 
+                    @if(auth()->user()->role === 'student')
+                        @if($internship->students->contains(auth()->user()->id))
+                            <a href="{{ route('entries.index', $internship->id) }}" class="btn btn-success btn-sm">My Journal</a>
+                        @endif
+                    @endif
+
                     @if(auth()->user()->role === 'admin')
                         <a href="{{ route('internships.edit', $internship) }}" class="btn btn-warning btn-sm">Edit</a>
 
@@ -37,7 +43,6 @@
         @endforeach
     </ul>
 </div>
-
 @endsection
 
 @section('scripts')

@@ -10,8 +10,13 @@ class InternshipController extends Controller
 {
     public function index()
     {
-        $internships = Internship::all();
-        return view('internships.index', ['internships' => $internships]);
+        if (auth()->user()->role === 'admin') {
+            $internships = Internship::all();
+        } else {
+            $internships = auth()->user()->internships;
+        }
+
+        return view('internships.index', compact('internships'));
     }
 
     public function create()
@@ -39,22 +44,23 @@ class InternshipController extends Controller
 
     public function show(Internship $internship)
     {
+        if (auth()->user()->role === 'student' &&
+            !$internship->students->contains(auth()->id())) {
+            abort(403);
+        }
+
         $addedStudents = $internship->students;
         $users = User::where('role', 'student')
             ->whereNotIn('id', $addedStudents->pluck('id'))
             ->get();
 
-        return view('internships.show', [
-            'internship' => $internship,
-            'users' => $users,
-            'addedStudents' => $addedStudents
-        ]);
+        return view('internships.show', compact('internship', 'users', 'addedStudents'));
     }
 
     public function edit(Internship $internship)
     {
         $this->authorizeAdmin();
-        return view('internships.edit', ['internship' => $internship]);
+        return view('internships.edit', compact('internship'));
     }
 
     public function update(Request $request, Internship $internship)
@@ -100,8 +106,6 @@ class InternshipController extends Controller
     public function removeStudent(Internship $internship, $id)
     {
         $this->authorizeAdmin();
-
-        $student = User::findOrFail($id);
 
         if (!$internship->students()->where('user_id', $id)->exists()) {
             return back()->with('error', 'Student is not attached to this internship.');
