@@ -29,19 +29,24 @@ class DailyEntryController extends Controller
         return view('entries.index', compact('entries', 'internship'));
     }
 
-    public function create(Internship $internship)
-    {
-        $user = auth()->user();
+public function create(Internship $internship)
+{
+    $user = auth()->user();
 
-        if ($user->role === 'student' && !$internship->students->contains($user->id)) {
-            abort(403);
-        }
-
-        $themes = Theme::where('internship_id', $internship->id)->get();
-
-        return view('entries.create', compact('internship', 'themes'));
+    if ($user->role === 'student' && !$internship->students->contains($user->id)) {
+        abort(403);
     }
 
+    $themes = Theme::where('internship_id', $internship->id)
+        ->whereHas('users', function ($q) use ($user) {
+            $q->where('user_id', $user->id)
+              ->whereColumn('assigned_hours', '>', 'used_hours');
+        })
+        ->get();
+
+    return view('entries.create', compact('internship', 'themes'));
+}
+    
     public function store(Request $request, Internship $internship)
     {
         $user = auth()->user();
@@ -51,57 +56,60 @@ class DailyEntryController extends Controller
         }
 
         $request->validate([
-            'theme_id'      => 'required|exists:themes,id',
-            'date'          => 'required|date|after_or_equal:' . $internship->start_date . '|before_or_equal:' . $internship->end_date,
-            'location'      => 'required|in:remote,on-site,mixed',
-            'time_from'     => 'required|date_format:H:i',
-            'time_to'       => 'required|date_format:H:i|after:time_from',
-            'credit_hours'  => 'required|integer|min:1|max:12',
-            'intern_comment'=> 'nullable|string',
+            'theme_id'     => 'required|exists:themes,id',
+            'date'         => 'required|date|after_or_equal:' . $internship->start_date . '|before_or_equal:' . $internship->end_date,
+            'location'     => 'required|in:remote,on-site,mixed',
+            'time_from'    => 'required|date_format:H:i',
+            'time_to'      => 'required|date_format:H:i|after:time_from',
+            'credit_hours' => 'required|integer|min:1|max:12',
+            'intern_comment' => 'nullable|string',
         ]);
 
         $theme = Theme::where('id', $request->theme_id)
             ->where('internship_id', $internship->id)
             ->firstOrFail();
 
-        $seconds = strtotime($request->time_to) - strtotime($request->time_from);
-        $durationHours = $seconds / 3600;
+        $pivot = $theme->users()
+            ->where('user_id', $user->id)
+            ->firstOrFail()
+            ->pivot;
 
-        if ($durationHours <= 0) {
-            return back()->withErrors(['time_to' => 'End time must be after start time.'])->withInput();
-        }
+        $remaining = $pivot->assigned_hours - $pivot->used_hours;
 
-        $currentThemeHours = DailyEntry::where('theme_id', $theme->id)->sum('credit_hours');
-
-        if ($currentThemeHours + $request->credit_hours > $theme->max_hours) {
+        if ($request->credit_hours > $remaining) {
             return back()->withErrors([
-                'credit_hours' => 'This theme exceeds its allowed hours (' . $theme->max_hours . 'h).',
+                'credit_hours' => 'Only '.$remaining.' hours remaining for this plan.',
             ])->withInput();
         }
 
-        $currentTotalHours = DailyEntry::where('internship_id', $internship->id)
+        $seconds = strtotime($request->time_to) - strtotime($request->time_from);
+        $durationHours = $seconds / 3600;
+
+        $totalUserHours = DailyEntry::where('internship_id', $internship->id)
             ->where('user_id', $user->id)
             ->sum('credit_hours');
 
-        if ($currentTotalHours + $request->credit_hours > 160) {
+        if ($totalUserHours + $request->credit_hours > 160) {
             return back()->withErrors([
                 'credit_hours' => 'You cannot exceed the 160-hour limit for this internship.',
             ])->withInput();
         }
 
         DailyEntry::create([
-            'internship_id'         => $internship->id,
-            'user_id'               => $user->id,
-            'theme_id'              => $theme->id,
-            'date'                  => $request->date,
-            'location'              => $request->location,
-            'time_from'             => $request->time_from,
-            'time_to'               => $request->time_to,
-            'duration'              => $durationHours . ' h',
-            'credit_hours'          => $request->credit_hours,
-            'intern_comment'        => $request->intern_comment,
-            'org_supervisor_comment'=> null,
-            'grade'                 => null,
+            'internship_id' => $internship->id,
+            'user_id' => $user->id,
+            'theme_id' => $theme->id,
+            'date' => $request->date,
+            'location' => $request->location,
+            'time_from' => $request->time_from,
+            'time_to' => $request->time_to,
+            'duration' => $durationHours . ' h',
+            'credit_hours' => $request->credit_hours,
+            'intern_comment' => $request->intern_comment,
+        ]);
+
+        $theme->users()->updateExistingPivot($user->id, [
+            'used_hours' => $pivot->used_hours + $request->credit_hours,
         ]);
 
         return redirect()->route('entries.index', $internship->id)

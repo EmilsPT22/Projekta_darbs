@@ -18,58 +18,79 @@
         <li class="list-group-item"><strong>End Date:</strong> {{ \Carbon\Carbon::parse($internship->end_date)->format('d/m/Y') }}</li>
     </ul>
 
-    <h2 class="mb-3">Added Students</h2>
-    @if($addedStudents->isEmpty())
-        <p>No students added yet.</p>
-    @else
-        <ul class="list-group mb-4">
-           @foreach($addedStudents as $student)
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-        {{ $student->name }} ({{ $student->email }})
-
-        <div class="d-flex gap-2">
-
-            <a href="{{ route('entries.student', ['internship' => $internship->id, 'student' => $student->id]) }}" 
-               class="btn btn-secondary btn-sm">
-                View Journal
-            </a>
-
-            @if(auth()->user()->role === 'admin')
-                <form action="{{ route('internships.removeStudent', ['internship' => $internship->id, 'id' => $student->id]) }}" 
-                      method="POST" style="display:inline;">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-                </form>
-            @endif
-        </div>
-    </li>
-@endforeach
-        </ul>
-    @endif
-
+    {{-- ADMIN ONLY --}}
     @if(auth()->user()->role === 'admin')
-        <h2 class="mb-3">Add Students</h2>
-        @if($users->isEmpty())
-            <p>All students have been added.</p>
+
+        <h2 class="mb-3">Added Students</h2>
+
+        @if($addedStudents->isEmpty())
+            <p>No students added yet.</p>
         @else
             <ul class="list-group mb-4">
-                @foreach($users as $user)
+                @foreach($addedStudents as $student)
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        {{ $user->name }} ({{ $user->email }})
-                        <form action="{{ route('internships.addStudent', ['internship' => $internship->id, 'id' => $user->id]) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn btn-success btn-sm">Add</button>
-                        </form>
+                        {{ $student->name }} ({{ $student->email }})
+
+                        <div class="d-flex gap-2">
+                            <a
+                                href="{{ route('entries.student', ['internship' => $internship->id, 'student' => $student->id]) }}"
+                                class="btn btn-secondary btn-sm"
+                            >
+                                View Journal
+                            </a>
+
+                            <form
+                                action="{{ route('internships.removeStudent', ['internship' => $internship->id, 'id' => $student->id]) }}"
+                                method="POST"
+                                style="display:inline;"
+                            >
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    Remove
+                                </button>
+                            </form>
+                        </div>
                     </li>
                 @endforeach
             </ul>
         @endif
+
     @endif
 
-    <a href="{{ route('internships.index') }}" class="btn btn-primary">Back to Internships</a>
+    <a href="{{ route('internships.index') }}" class="btn btn-primary">
+        Back to Internships
+    </a>
 </div>
+
+@if(auth()->user()->role === 'admin')
+    <h2 class="mb-3">Add Students</h2>
+
+    @if($users->isEmpty())
+        <p>All students have been added.</p>
+    @else
+        <ul class="list-group mb-4">
+            @foreach($users as $user)
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ $user->name }} ({{ $user->email }})
+
+                    <form
+                        action="{{ route('internships.addStudent', ['internship' => $internship->id, 'id' => $user->id]) }}"
+                        method="POST"
+                    >
+                        @csrf
+                        <button class="btn btn-success btn-sm">
+                            Add
+                        </button>
+                    </form>
+                </li>
+            @endforeach
+        </ul>
+    @endif
+@endif
+
 @endsection
+
 
 
 @section('scripts')

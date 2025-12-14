@@ -4,7 +4,6 @@
 <div class="container">
 
     <h2>{{ $student->name }} – Journal Entries</h2>
-    <h5 class="text-muted">{{ $internship->name }}</h5>
 
     @if($entries->isEmpty())
         <p>No entries found.</p>

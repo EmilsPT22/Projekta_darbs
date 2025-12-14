@@ -21,10 +21,12 @@
                 <option value="" disabled selected>Select theme</option>
                 @foreach($themes as $theme)
                     <option value="{{ $theme->id }}">
-                        {{ $theme->name }} ({{ $theme->max_hours }} h)
+                        {{ $theme->name }}
+                        ({{ $theme->remainingHoursForUser(auth()->id()) }} h left)
                     </option>
                 @endforeach
             </select>
+
         </div>
 
         <div class="mb-3">
