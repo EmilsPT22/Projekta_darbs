@@ -49,10 +49,16 @@ class User extends Authenticatable
     }
 
     public function internships()
-{
-    return $this->belongsToMany(Internship::class);
-}
+    {
+        return $this->belongsToMany(Internship::class);
+    }
 
+    public function themes()
+    {
+        return $this->belongsToMany(Theme::class)
+            ->withPivot(['assigned_hours', 'used_hours'])
+            ->withTimestamps();
+    }   
 
 
 }

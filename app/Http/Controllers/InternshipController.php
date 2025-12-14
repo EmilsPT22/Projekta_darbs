@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Internship;
+use App\Models\Theme;
 use Illuminate\Http\Request;
 use App\Models\User;
 
@@ -44,15 +45,20 @@ class InternshipController extends Controller
 
     public function show(Internship $internship)
     {
-        if (auth()->user()->role === 'student' &&
-            !$internship->students->contains(auth()->id())) {
+        $user = auth()->user();
+
+        if ($user->role === 'student' && !$internship->students->contains($user->id)) {
             abort(403);
         }
 
         $addedStudents = $internship->students;
-        $users = User::where('role', 'student')
-            ->whereNotIn('id', $addedStudents->pluck('id'))
-            ->get();
+        $users = collect();
+
+        if ($user->role === 'admin') {
+            $users = User::where('role', 'student')
+                ->whereNotIn('id', $addedStudents->pluck('id'))
+                ->get();
+        }
 
         return view('internships.show', compact('internship', 'users', 'addedStudents'));
     }
@@ -100,16 +106,21 @@ class InternshipController extends Controller
 
         $internship->students()->attach($id);
 
+        $themes = Theme::where('internship_id', $internship->id)->get();
+
+        foreach ($themes as $theme) {
+            $theme->users()->attach($student->id, [
+                'assigned_hours' => $theme->max_hours,
+                'used_hours' => 0,
+            ]);
+        }
+
         return back()->with('success', 'Student added successfully.');
     }
 
     public function removeStudent(Internship $internship, $id)
     {
         $this->authorizeAdmin();
-
-        if (!$internship->students()->where('user_id', $id)->exists()) {
-            return back()->with('error', 'Student is not attached to this internship.');
-        }
 
         $internship->students()->detach($id);
 
