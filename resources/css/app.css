@@ -299,3 +299,24 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
+.profile-card .btn-save {
+    background-color: #198754 !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+.profile-card .btn-save:hover {
+    background-color: #157347 !important;
+}
+
+.profile-card .btn-delete {
+    background-color: #dc3545 !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+.profile-card .btn-delete:hover {
+    background-color: #bb2d3b !important;
+}
+
+

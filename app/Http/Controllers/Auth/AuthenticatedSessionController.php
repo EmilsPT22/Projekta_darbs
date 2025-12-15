@@ -21,7 +21,7 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
         $request->session()->regenerate();
 
-        return redirect('/internships');
+        return redirect('/');
     }
 
     public function destroy(Request $request): RedirectResponse
