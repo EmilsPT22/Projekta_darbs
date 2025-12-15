@@ -3,9 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Internship;
+
 
 class Theme extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'internship_id',
         'name',

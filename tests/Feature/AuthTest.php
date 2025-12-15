@@ -4,12 +4,14 @@ use App\Models\User;
 
 test('login screen can be rendered', function () {
     $response = $this->get('/login');
-
     $response->assertStatus(200);
 });
 
 test('users can authenticate using the login screen', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'password' => bcrypt('password'),
+        'role' => 'student',
+    ]);
 
     $response = $this->post('/login', [
         'email' => $user->email,
@@ -20,8 +22,10 @@ test('users can authenticate using the login screen', function () {
     $response->assertRedirect('/');
 });
 
-test('users can not authenticate with invalid password', function () {
-    $user = User::factory()->create();
+test('users cannot authenticate with invalid password', function () {
+    $user = User::factory()->create([
+        'password' => bcrypt('password'),
+    ]);
 
     $this->post('/login', [
         'email' => $user->email,
