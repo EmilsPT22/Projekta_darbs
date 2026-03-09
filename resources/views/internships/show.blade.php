@@ -4,7 +4,7 @@
 <div class="container py-4">
     <h1 class="mb-4">Internship Details</h1>
 
-    @if(auth()->user()->role === 'admin')
+    @if(auth()->user()->hasRole('admin'))
         <a href="{{ route('themes.index', $internship->id) }}" class="btn btn-secondary mb-3">
             Manage Themes
         </a>
@@ -19,7 +19,7 @@
     </ul>
 
     {{-- ADMIN ONLY --}}
-    @if(auth()->user()->role === 'admin')
+    @if(auth()->user()->hasRole('admin'))
 
         <h2 class="mb-3">Added Students</h2>
 
@@ -63,7 +63,7 @@
     </a>
 </div>
 
-@if(auth()->user()->role === 'admin')
+@if(auth()->user()->hasRole('admin'))
     <h2 class="mb-3">Add Students</h2>
 
     @if($users->isEmpty())

@@ -11,7 +11,7 @@ class InternshipController extends Controller
 {
     public function index()
     {
-        if (auth()->user()->role === 'admin') {
+        if (auth()->user()->hasRole('admin')) {
             $internships = Internship::all();
         } else {
             $internships = auth()->user()->internships;
@@ -47,17 +47,17 @@ class InternshipController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->role === 'student' && !$internship->students->contains($user->id)) {
+        if ($user->hasRole('student') && !$internship->students->contains($user->id)) {
             abort(403);
         }
 
         $addedStudents = $internship->students;
         $users = collect();
 
-        if ($user->role === 'admin') {
-            $users = User::where('role', 'student')
-                ->whereNotIn('id', $addedStudents->pluck('id'))
-                ->get();
+        if ($user->hasRole('admin')) {
+            $users = User::whereDoesntHave('roles', function ($query) {
+                $query->where('name', 'admin');
+            })->whereNotIn('id', $addedStudents->pluck('id'))->get();
         }
 
         return view('internships.show', compact('internship', 'users', 'addedStudents'));
@@ -129,7 +129,7 @@ class InternshipController extends Controller
 
     private function authorizeAdmin()
     {
-        if (auth()->user()->role !== 'admin') {
+        if (!auth()->user()->hasRole('admin')) {
             abort(403);
         }
     }

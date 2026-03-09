@@ -13,7 +13,10 @@ class InternshipTest extends TestCase
 
     public function test_admin_can_create_internship()
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->admin()->create();
+
+        $response = $this->actingAs($admin)
+            ->get('/internships/create');
 
         $response = $this->actingAs($admin)->post('/internships', [
             'name' => 'Internship A',
@@ -31,7 +34,9 @@ class InternshipTest extends TestCase
 
     public function test_student_cannot_create_internship()
     {
-        $student = User::factory()->create(['role' => 'student']);
+        $student = User::factory()->student()->create();
+
+        $this->actingAs($student)->get('/internships/create');
 
         $response = $this->actingAs($student)->post('/internships', []);
 

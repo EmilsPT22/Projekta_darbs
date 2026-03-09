@@ -10,7 +10,7 @@ class ThemeController extends Controller
 {
     private function authorizeAdmin()
     {
-        if (auth()->user()->role !== 'admin') {
+        if (!auth()->user()->hasRole('admin')) {
             abort(403);
         }
     }

@@ -1,28 +1,70 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container py-4">
+    <h2 class="mb-4">{{ $student->name }} – Journal Entries</h2>
 
-    <h2>{{ $student->name }} – Journal Entries</h2>
-
-    @if($entries->isEmpty())
-        <p>No entries found.</p>
-    @else
-        <ul class="list-group">
-            @foreach($entries as $entry)
-                <li class="list-group-item">
-                    <strong>{{ $entry->date }}</strong>
-                    <br>
-                    Plan: {{ $entry->theme->name }}
-                    <br>
-                    Hours: {{ $entry->credit_hours }}
-                </li>
-            @endforeach
-        </ul>
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+        </div>
     @endif
 
-    <a href="{{ route('internships.show', $internship->id) }}" class="btn btn-primary mt-3">Back</a>
+    @if($entries->isEmpty())
+        <div class="alert alert-info">No entries found.</div>
+    @else
+        <div class="table-responsive">
+            <table class="table table-hover table-dark">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Plan</th>
+                        <th>Location</th>
+                        <th>Hours</th>
+                        <th>Intern Comment</th>
+                        <th>Admin Comment</th>
+                        <th>Grade</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($entries as $entry)
+                        <tr>
+                            <td>{{ $entry->date }}</td>
+                            <td>{{ $entry->theme->name }}</td>
+                            <td>
+                                <span class="badge bg-info">{{ $entry->location }}</span>
+                            </td>
+                            <td>{{ $entry->credit_hours }}</td>
+                            <td>{{ $entry->intern_comment ?? '-' }}</td>
+                            <td>
+                                @if($entry->admin_comment)
+                                    <small>{{ Str::limit($entry->admin_comment, 50) }}</small>
+                                @else
+                                    <span class="text-muted">No comment</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($entry->grade)
+                                    <span class="badge bg-primary">{{ $entry->grade }}/10</span>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td>
+                                <a href="{{ route('entries.edit', [$internship->id, $entry->id]) }}" class="btn btn-warning btn-sm">
+                                    Edit
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
 
+    <a href="{{ route('internships.show', $internship->id) }}" class="btn btn-primary mt-3">Back to Internship</a>
 </div>
 @endsection
 

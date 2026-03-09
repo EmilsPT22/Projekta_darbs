@@ -23,18 +23,17 @@ class UserFactory extends Factory
      * @return array<string, mixed>
      */
     public function definition()
-{
+    {
+        $email = $this->faker->unique()->safeEmail();
 
-    $email = $this->faker->unique()->safeEmail();
-
-    return [
-        'name' => $this->faker->name(),
-        'email' => $email,
-        'email_verified_at' => now(),
-        'password' => bcrypt('password'),
-        'remember_token' => \Str::random(10),
-    ];
-}
+        return [
+            'name' => $this->faker->name(),
+            'email' => $email,
+            'email_verified_at' => now(),
+            'password' => bcrypt('password'),
+            'remember_token' => \Str::random(10),
+        ];
+    }
 
     /**
      * Indicate that the model's email address should be unverified.
@@ -44,6 +43,26 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
+    }
+
+    /**
+     * Indicate that the user should have the admin role.
+     */
+    public function admin(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->assignRole('admin');
+        });
+    }
+
+    /**
+     * Indicate that the user should have the student role.
+     */
+    public function student(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->assignRole('student');
+        });
     }
 }
 

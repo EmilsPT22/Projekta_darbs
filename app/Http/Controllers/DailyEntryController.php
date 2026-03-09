@@ -14,7 +14,7 @@ class DailyEntryController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->role === 'student') {
+        if ($user->hasRole('student')) {
             if (!$internship->students->contains($user->id)) {
                 abort(403);
             }
@@ -33,9 +33,12 @@ public function create(Internship $internship)
 {
     $user = auth()->user();
 
-    if ($user->role === 'student' && !$internship->students->contains($user->id)) {
+    if ($user->hasRole('student') && !$internship->students->contains($user->id)) {
         abort(403);
     }
+
+    // Ensure student has themes assigned (in case themes were added after student was assigned)
+    $this->assignThemesToStudent($internship, $user);
 
     $themes = Theme::where('internship_id', $internship->id)
         ->whereHas('users', function ($q) use ($user) {
@@ -46,12 +49,34 @@ public function create(Internship $internship)
 
     return view('entries.create', compact('internship', 'themes'));
 }
+
+    /**
+     * Assign any missing themes to a student.
+     */
+    private function assignThemesToStudent(Internship $internship, $student)
+    {
+        $themes = Theme::where('internship_id', $internship->id)->get();
+
+        foreach ($themes as $theme) {
+            // Check if student already has this theme assigned
+            $exists = $theme->users()
+                ->where('user_id', $student->id)
+                ->exists();
+
+            if (!$exists) {
+                $theme->users()->attach($student->id, [
+                    'assigned_hours' => $theme->max_hours,
+                    'used_hours' => 0,
+                ]);
+            }
+        }
+    }
     
     public function store(Request $request, Internship $internship)
     {
         $user = auth()->user();
 
-        if ($user->role !== 'student' || !$internship->students->contains($user->id)) {
+        if ($user->hasRole('student') && !$internship->students->contains($user->id)) {
             abort(403);
         }
 
@@ -118,7 +143,7 @@ public function create(Internship $internship)
 
     public function studentEntries(Internship $internship, User $student)
     {
-        if (auth()->user()->role !== 'admin') {
+        if (!auth()->user()->hasRole('admin')) {
             abort(403);
         }
 
@@ -127,5 +152,34 @@ public function create(Internship $internship)
             ->get();
 
         return view('entries.student', compact('entries', 'student', 'internship'));
+    }
+
+    public function edit(Internship $internship, DailyEntry $entry)
+    {
+        if (!auth()->user()->hasRole('admin')) {
+            abort(403);
+        }
+
+        return view('entries.edit', compact('internship', 'entry'));
+    }
+
+    public function update(Request $request, Internship $internship, DailyEntry $entry)
+    {
+        if (!auth()->user()->hasRole('admin')) {
+            abort(403);
+        }
+
+        $request->validate([
+            'admin_comment' => 'nullable|string|max:1000',
+            'grade' => 'nullable|integer|min:1|max:10',
+        ]);
+
+        $entry->update([
+            'admin_comment' => $request->admin_comment,
+            'grade' => $request->grade,
+        ]);
+
+        return redirect()->route('entries.index', $internship->id)
+            ->with('success', 'Entry feedback updated successfully');
     }
 }

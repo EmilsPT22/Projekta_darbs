@@ -8,7 +8,7 @@
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-    @if(auth()->user()->role === 'admin')
+    @if(auth()->user()->hasRole('admin'))
         <a href="{{ route('internships.create') }}" class="btn btn-primary mb-3">Create Internship</a>
     @endif
 
@@ -23,13 +23,13 @@
                 <div>
                     <a href="{{ route('internships.show', $internship) }}" class="btn btn-info btn-sm">View</a>
 
-                    @if(auth()->user()->role === 'student')
+                    @if(auth()->user()->hasRole('student'))
                         @if($internship->students->contains(auth()->user()->id))
                             <a href="{{ route('entries.index', $internship->id) }}" class="btn btn-success btn-sm">My Journal</a>
                         @endif
                     @endif
 
-                    @if(auth()->user()->role === 'admin')
+                    @if(auth()->user()->hasRole('admin'))
                         <a href="{{ route('internships.edit', $internship) }}" class="btn btn-warning btn-sm">Edit</a>
 
                         <form action="{{ route('internships.destroy', $internship) }}" method="POST" style="display:inline;">

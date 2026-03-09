@@ -45,3 +45,12 @@ function something()
 {
     // ..
 }
+
+/**
+ * Seed roles for Spatie Permission tests.
+ */
+function seedRoles(): void
+{
+    \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin']);
+    \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'student']);
+}

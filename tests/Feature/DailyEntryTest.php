@@ -15,7 +15,8 @@ class DailyEntryTest extends TestCase
 
     public function test_student_can_add_entry_within_theme_hours()
     {
-        $student = User::factory()->create(['role' => 'student']);
+        $student = User::factory()->student()->create();
+        
         $internship = Internship::factory()->create();
         $internship->students()->attach($student);
 
@@ -28,6 +29,8 @@ class DailyEntryTest extends TestCase
             'assigned_hours' => 20,
             'used_hours' => 0,
         ]);
+
+        $this->actingAs($student)->get("/internships/{$internship->id}/entries/create");
 
         $response = $this->actingAs($student)->post(
             "/internships/{$internship->id}/entries",
@@ -49,7 +52,8 @@ class DailyEntryTest extends TestCase
 
     public function test_student_cannot_exceed_theme_hours()
     {
-        $student = User::factory()->create(['role' => 'student']);
+        $student = User::factory()->student()->create();
+        
         $internship = Internship::factory()->create();
         $internship->students()->attach($student);
 
@@ -62,6 +66,8 @@ class DailyEntryTest extends TestCase
             'assigned_hours' => 5,
             'used_hours' => 4,
         ]);
+
+        $this->actingAs($student)->get("/internships/{$internship->id}/entries/create");
 
         $response = $this->actingAs($student)->post(
             "/internships/{$internship->id}/entries",

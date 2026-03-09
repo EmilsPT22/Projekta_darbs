@@ -14,8 +14,11 @@ class ThemeTest extends TestCase
 
     public function test_admin_can_add_theme()
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->admin()->create();
+        
         $internship = Internship::factory()->create();
+
+        $this->actingAs($admin)->get("/internships/{$internship->id}/themes/create");
 
         $response = $this->actingAs($admin)->post(
             "/internships/{$internship->id}/themes",

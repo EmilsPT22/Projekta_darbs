@@ -8,6 +8,8 @@ test('registration screen can be rendered', function () {
 });
 
 test('new users can register and are students', function () {
+    $this->get('/register');
+
     $response = $this->post('/register', [
         'name' => 'Test User',
         'email' => 'test@example.com',
@@ -17,8 +19,6 @@ test('new users can register and are students', function () {
 
     $response->assertRedirect('/internships');
 
-    $this->assertDatabaseHas('users', [
-        'email' => 'test@example.com',
-        'role' => 'student',
-    ]);
+    $user = User::where('email', 'test@example.com')->first();
+    expect($user->hasRole('student'))->toBeTrue();
 });

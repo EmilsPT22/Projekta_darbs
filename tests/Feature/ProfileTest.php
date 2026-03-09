@@ -15,6 +15,8 @@ test('profile page is displayed', function () {
 test('profile information can be updated', function () {
     $user = User::factory()->create();
 
+    $this->actingAs($user)->get('/profile');
+
     $response = $this
         ->actingAs($user)
         ->patch('/profile', [
@@ -36,6 +38,8 @@ test('profile information can be updated', function () {
 test('email verification status is unchanged when the email address is unchanged', function () {
     $user = User::factory()->create();
 
+    $this->actingAs($user)->get('/profile');
+
     $response = $this
         ->actingAs($user)
         ->patch('/profile', [
@@ -52,6 +56,8 @@ test('email verification status is unchanged when the email address is unchanged
 
 test('user can delete their account', function () {
     $user = User::factory()->create();
+
+    $this->actingAs($user)->get('/profile');
 
     $response = $this
         ->actingAs($user)

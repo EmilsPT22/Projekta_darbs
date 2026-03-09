@@ -10,17 +10,16 @@ Route::get('/', function () {
     return view('home');
 });
 
-Route::resource('internships', InternshipController::class);
-
-Route::post('internships/{internship}/addStudent/{id}', 
-    [InternshipController::class, 'addStudent']
-)->name('internships.addStudent');
-
-Route::delete('internships/{internship}/removeStudent/{id}', 
-    [InternshipController::class, 'removeStudent']
-)->name('internships.removeStudent');
-
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::resource('internships', InternshipController::class);
+
+    Route::post('internships/{internship}/addStudent/{id}',
+        [InternshipController::class, 'addStudent']
+    )->name('internships.addStudent');
+
+    Route::delete('internships/{internship}/removeStudent/{id}',
+        [InternshipController::class, 'removeStudent']
+    )->name('internships.removeStudent');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -35,6 +34,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/entries', [DailyEntryController::class, 'index'])->name('entries.index');
     Route::get('/entries/create', [DailyEntryController::class, 'create'])->name('entries.create');
     Route::post('/entries', [DailyEntryController::class, 'store'])->name('entries.store');
+
+    Route::get('/entries/{entry}/edit', [DailyEntryController::class, 'edit'])->name('entries.edit');
+    Route::patch('/entries/{entry}', [DailyEntryController::class, 'update'])->name('entries.update');
 
     Route::get('/entries/student/{student}', [DailyEntryController::class, 'studentEntries'])
         ->name('entries.student');
