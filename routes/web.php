@@ -32,6 +32,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('internships/{internship}')->group(function () {
 
     Route::get('/entries', [DailyEntryController::class, 'index'])->name('entries.index');
+    Route::get('/entries/calendar', [DailyEntryController::class, 'calendar'])->name('entries.calendar');
     Route::get('/entries/create', [DailyEntryController::class, 'create'])->name('entries.create');
     Route::post('/entries', [DailyEntryController::class, 'store'])->name('entries.store');
 

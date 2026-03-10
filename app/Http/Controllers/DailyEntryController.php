@@ -29,6 +29,25 @@ class DailyEntryController extends Controller
         return view('entries.index', compact('entries', 'internship'));
     }
 
+    public function calendar(Internship $internship)
+    {
+        $user = auth()->user();
+
+        if ($user->hasRole('student')) {
+            if (!$internship->students->contains($user->id)) {
+                abort(403);
+            }
+
+            $entries = DailyEntry::where('internship_id', $internship->id)
+                ->where('user_id', $user->id)
+                ->get();
+        } else {
+            $entries = DailyEntry::where('internship_id', $internship->id)->get();
+        }
+
+        return view('entries.calendar', compact('entries', 'internship'));
+    }
+
 public function create(Internship $internship)
 {
     $user = auth()->user();

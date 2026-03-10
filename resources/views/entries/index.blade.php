@@ -2,17 +2,25 @@
 
 @section('content')
 <div class="container py-4">
-    <h2 class="mb-4">Journal – {{ $internship->name }}</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Journal – {{ $internship->name }}</h2>
+        <div>
+            <a href="{{ route('entries.calendar', $internship->id) }}" class="btn btn-primary">
+                📅 Calendar View
+            </a>
+            @if(auth()->user()->hasRole('student'))
+                <a href="{{ route('entries.create', $internship->id) }}" class="btn btn-success ms-2">
+                    + Add Entry
+                </a>
+            @endif
+        </div>
+    </div>
 
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
         </div>
-    @endif
-
-    @if(auth()->user()->hasRole('student'))
-        <a href="{{ route('entries.create', $internship->id) }}" class="btn btn-success mb-3">Add Entry</a>
     @endif
 
     <div class="table-responsive">
