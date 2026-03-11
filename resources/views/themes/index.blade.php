@@ -4,7 +4,9 @@
 <div class="container">
     <h1>Themes for Internship: {{ $internship->name }}</h1>
 
-    <a href="{{ route('themes.create', $internship->id) }}" class="btn btn-primary mb-3">Add Theme</a>
+    @if(auth()->user()->hasRole('admin'))
+        <a href="{{ route('themes.create', $internship->id) }}" class="btn btn-primary mb-3">Add Theme</a>
+    @endif
 
     <ul class="list-group">
         @foreach($themes as $theme)
@@ -14,6 +16,7 @@
                     <small>{{ $theme->max_hours }} hours available</small>
                 </div>
 
+                @if(auth()->user()->hasRole('admin'))
                 <div>
                     <a href="{{ route('themes.edit', [$internship->id, $theme->id]) }}"
                        class="btn btn-warning btn-sm">Edit</a>
@@ -28,6 +31,15 @@
                         </button>
                     </form>
                 </div>
+                @endif
+
+                @if(auth()->user()->hasAnyRole(['admin', 'teacher']))
+                <div>
+                    <a href="{{ route('entries.index', $internship->id) }}" class="btn btn-success btn-sm">
+                        View Entries
+                    </a>
+                </div>
+                @endif
             </li>
         @endforeach
     </ul>

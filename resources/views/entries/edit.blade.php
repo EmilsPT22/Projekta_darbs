@@ -2,7 +2,13 @@
 
 @section('content')
 <div class="container py-4">
-    <h2 class="mb-4">Add Feedback – {{ $internship->name }}</h2>
+    <h2 class="mb-4">
+        @if(auth()->user()->hasRole('admin'))
+            Edit Entry – {{ $internship->name }}
+        @else
+            Grade Entry – {{ $internship->name }}
+        @endif
+    </h2>
 
     <div class="card mb-4 bg-dark border-secondary">
         <div class="card-header border-secondary">
@@ -32,6 +38,7 @@
         @csrf
         @method('PATCH')
 
+        @if(auth()->user()->hasRole('admin'))
         <div class="mb-3">
             <label for="admin_comment" class="form-label">Admin Comment</label>
             <textarea name="admin_comment" id="admin_comment" class="form-control" rows="4" placeholder="Add your feedback or comments here...">{{ old('admin_comment', $entry->admin_comment) }}</textarea>
@@ -39,16 +46,23 @@
                 <div class="text-danger small mt-1">{{ $message }}</div>
             @enderror
         </div>
+        @endif
 
         <div class="mb-3">
             <label for="grade" class="form-label">Grade (1-10)</label>
-            <input type="number" name="grade" id="grade" class="form-control" min="1" max="10" value="{{ old('grade', $entry->grade) }}" placeholder="Optional grade">
+            <input type="number" name="grade" id="grade" class="form-control" min="1" max="10" value="{{ old('grade', $entry->grade) }}" placeholder="Enter grade" required>
             @error('grade')
                 <div class="text-danger small mt-1">{{ $message }}</div>
             @enderror
         </div>
 
-        <button type="submit" class="btn btn-primary">Save Feedback</button>
+        <button type="submit" class="btn btn-primary">
+            @if(auth()->user()->hasRole('admin'))
+                Save Changes
+            @else
+                Save Grade
+            @endif
+        </button>
         <a href="{{ route('entries.index', $internship->id) }}" class="btn btn-secondary">Back</a>
     </form>
 </div>

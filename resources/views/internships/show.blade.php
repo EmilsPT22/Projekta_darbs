@@ -10,6 +10,12 @@
         </a>
     @endif
 
+    @if(auth()->user()->hasAnyRole(['admin', 'teacher']))
+        <a href="{{ route('entries.index', $internship->id) }}" class="btn btn-success mb-3">
+            View All Journal Entries
+        </a>
+    @endif
+
     <ul class="list-group mb-4">
         <li class="list-group-item"><strong>Name:</strong> {{ $internship->name }}</li>
         <li class="list-group-item"><strong>Description:</strong> {{ $internship->description }}</li>
@@ -18,10 +24,10 @@
         <li class="list-group-item"><strong>End Date:</strong> {{ \Carbon\Carbon::parse($internship->end_date)->format('d/m/Y') }}</li>
     </ul>
 
-    {{-- ADMIN ONLY --}}
-    @if(auth()->user()->hasRole('admin'))
+    {{-- ADMIN & TEACHER: View Students --}}
+    @if(auth()->user()->hasAnyRole(['admin', 'teacher']))
 
-        <h2 class="mb-3">Added Students</h2>
+        <h2 class="mb-3">Students</h2>
 
         @if($addedStudents->isEmpty())
             <p>No students added yet.</p>
@@ -39,6 +45,7 @@
                                 View Journal
                             </a>
 
+                            @if(auth()->user()->hasRole('admin'))
                             <form
                                 action="{{ route('internships.removeStudent', ['internship' => $internship->id, 'id' => $student->id]) }}"
                                 method="POST"
@@ -50,6 +57,7 @@
                                     Remove
                                 </button>
                             </form>
+                            @endif
                         </div>
                     </li>
                 @endforeach

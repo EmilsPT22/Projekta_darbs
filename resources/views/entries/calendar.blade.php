@@ -3,9 +3,9 @@
 @section('content')
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="mb-0">Calendar - {{ $internship->name }}</h2>
+        <h2 class="mb-0">Calendar - {{ $internship->name }} - {{ $student->name }}</h2>
         <div>
-            <a href="{{ route('entries.index', $internship->id) }}" class="btn btn-secondary btn-sm">
+            <a href="{{ route('entries.student', ['internship' => $internship->id, 'student' => $student->id]) }}" class="btn btn-secondary btn-sm">
                 List View
             </a>
             @if(auth()->user()->hasRole('student'))
@@ -27,7 +27,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
-        
+
         // Prepare events from entries
         var events = [
             @foreach($entries as $entry)
@@ -61,7 +61,7 @@
             eventClick: function(info) {
                 var event = info.event;
                 var props = event.extendedProps;
-                
+
                 var modalHtml = `
                     <div class="modal fade" id="entryModal" tabindex="-1">
                         <div class="modal-dialog modal-sm">
@@ -84,13 +84,13 @@
                         </div>
                     </div>
                 `;
-                
+
                 // Remove existing modal if any
                 var existingModal = document.getElementById('entryModal');
                 if (existingModal) {
                     existingModal.remove();
                 }
-                
+
                 document.body.insertAdjacentHTML('beforeend', modalHtml);
                 var modal = new bootstrap.Modal(document.getElementById('entryModal'));
                 modal.show();

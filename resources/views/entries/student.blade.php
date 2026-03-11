@@ -2,7 +2,12 @@
 
 @section('content')
 <div class="container py-4">
-    <h2 class="mb-4">{{ $student->name }} – Journal Entries</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">{{ $student->name }} – Journal Entries</h2>
+        <a href="{{ route('entries.calendar', ['internship' => $internship->id, 'student' => $student->id]) }}" class="btn btn-primary">
+            Calendar View
+        </a>
+    </div>
 
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">

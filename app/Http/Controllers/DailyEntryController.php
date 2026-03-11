@@ -23,29 +23,36 @@ class DailyEntryController extends Controller
                 ->where('user_id', $user->id)
                 ->get();
         } else {
+            // Admin and teacher can view all entries
             $entries = DailyEntry::where('internship_id', $internship->id)->get();
         }
 
         return view('entries.index', compact('entries', 'internship'));
     }
 
-    public function calendar(Internship $internship)
+    public function calendar(Internship $internship, User $student)
     {
         $user = auth()->user();
 
+        // Students can only see their own calendar
         if ($user->hasRole('student')) {
             if (!$internship->students->contains($user->id)) {
                 abort(403);
             }
-
             $entries = DailyEntry::where('internship_id', $internship->id)
                 ->where('user_id', $user->id)
                 ->get();
         } else {
-            $entries = DailyEntry::where('internship_id', $internship->id)->get();
+            // Admin and teacher must specify which student's calendar to view
+            if (!$internship->students->contains($student->id)) {
+                abort(403);
+            }
+            $entries = DailyEntry::where('internship_id', $internship->id)
+                ->where('user_id', $student->id)
+                ->get();
         }
 
-        return view('entries.calendar', compact('entries', 'internship'));
+        return view('entries.calendar', compact('entries', 'internship', 'student'));
     }
 
 public function create(Internship $internship)
@@ -162,7 +169,8 @@ public function create(Internship $internship)
 
     public function studentEntries(Internship $internship, User $student)
     {
-        if (!auth()->user()->hasRole('admin')) {
+        // Admin and teacher can view student entries
+        if (!auth()->user()->hasAnyRole(['admin', 'teacher'])) {
             abort(403);
         }
 
@@ -175,7 +183,10 @@ public function create(Internship $internship)
 
     public function edit(Internship $internship, DailyEntry $entry)
     {
-        if (!auth()->user()->hasRole('admin')) {
+        $user = auth()->user();
+        
+        // Admin can edit everything, teacher can only grade
+        if (!$user->hasAnyRole(['admin', 'teacher'])) {
             abort(403);
         }
 
@@ -184,19 +195,30 @@ public function create(Internship $internship)
 
     public function update(Request $request, Internship $internship, DailyEntry $entry)
     {
-        if (!auth()->user()->hasRole('admin')) {
+        $user = auth()->user();
+
+        if ($user->hasRole('admin')) {
+            $request->validate([
+                'admin_comment' => 'nullable|string|max:1000',
+                'grade' => 'nullable|integer|min:1|max:10',
+            ]);
+
+            $entry->update([
+                'admin_comment' => $request->admin_comment,
+                'grade' => $request->grade,
+            ]);
+        } elseif ($user->hasRole('teacher')) {
+            // Teachers can only change the grade
+            $request->validate([
+                'grade' => 'required|integer|min:1|max:10',
+            ]);
+
+            $entry->update([
+                'grade' => $request->grade,
+            ]);
+        } else {
             abort(403);
         }
-
-        $request->validate([
-            'admin_comment' => 'nullable|string|max:1000',
-            'grade' => 'nullable|integer|min:1|max:10',
-        ]);
-
-        $entry->update([
-            'admin_comment' => $request->admin_comment,
-            'grade' => $request->grade,
-        ]);
 
         return redirect()->route('entries.index', $internship->id)
             ->with('success', 'Entry feedback updated successfully');

@@ -27,7 +27,10 @@ class ThemeController extends Controller
 
     public function index(Internship $internship)
     {
-        $this->authorizeAdmin();
+        // Admin and teacher can view themes
+        if (!auth()->user()->hasAnyRole(['admin', 'teacher'])) {
+            abort(403);
+        }
 
         return view('themes.index', [
             'internship' => $internship,

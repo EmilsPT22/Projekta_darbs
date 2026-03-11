@@ -38,6 +38,10 @@
                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
                         </form>
                     @endif
+
+                    @if(auth()->user()->hasRole('teacher'))
+                        <a href="{{ route('entries.index', $internship->id) }}" class="btn btn-success btn-sm">View Journal</a>
+                    @endif
                 </div>
             </li>
         @endforeach

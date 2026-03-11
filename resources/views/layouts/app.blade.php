@@ -24,6 +24,9 @@
            <ul class="navbar-nav ms-auto text-right">
                 @auth
                     <li class="nav-item">
+                        <span class="nav-link text-muted small">{{ ucfirst(auth()->user()->getRoleNames()->first()) }}</span>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ route('internships.index') }}">Internships</a>
                     </li>
                     <li class="nav-item">

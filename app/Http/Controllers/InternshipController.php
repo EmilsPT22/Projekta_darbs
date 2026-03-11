@@ -13,6 +13,9 @@ class InternshipController extends Controller
     {
         if (auth()->user()->hasRole('admin')) {
             $internships = Internship::all();
+        } elseif (auth()->user()->hasRole('teacher')) {
+            // Teachers can view all internships
+            $internships = Internship::all();
         } else {
             $internships = auth()->user()->internships;
         }
@@ -58,6 +61,9 @@ class InternshipController extends Controller
             $users = User::whereDoesntHave('roles', function ($query) {
                 $query->where('name', 'admin');
             })->whereNotIn('id', $addedStudents->pluck('id'))->get();
+        } elseif ($user->hasRole('teacher')) {
+            // Teachers can view students but not manage them
+            $users = $addedStudents;
         }
 
         return view('internships.show', compact('internship', 'users', 'addedStudents'));
