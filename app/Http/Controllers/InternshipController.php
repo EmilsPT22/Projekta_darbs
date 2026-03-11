@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Internship;
 use App\Models\Theme;
+use App\Models\InternshipApplication;
 use Illuminate\Http\Request;
 use App\Models\User;
 
@@ -114,6 +115,12 @@ class InternshipController extends Controller
             return back()->with('error', 'This student is already added.');
         }
 
+        // Check if student is already in another internship
+        $existingInternship = $student->internships()->first();
+        if ($existingInternship && $existingInternship->id !== $internship->id) {
+            return back()->with('error', 'This student is already enrolled in another internship: ' . $existingInternship->name);
+        }
+
         $internship->students()->attach($id);
 
         $themes = Theme::where('internship_id', $internship->id)->get();
@@ -132,7 +139,19 @@ class InternshipController extends Controller
     {
         $this->authorizeAdmin();
 
+        // Remove student from internship
         $internship->students()->detach($id);
+
+        // Remove related themes
+        $themes = Theme::where('internship_id', $internship->id)->get();
+        foreach ($themes as $theme) {
+            $theme->users()->detach($id);
+        }
+
+        // Delete the application so student can reapply
+        InternshipApplication::where('internship_id', $internship->id)
+            ->where('user_id', $id)
+            ->delete();
 
         return back()->with('success', 'Student removed successfully.');
     }

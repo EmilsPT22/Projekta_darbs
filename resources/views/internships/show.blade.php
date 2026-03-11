@@ -4,6 +4,20 @@
 <div class="container py-4">
     <h1 class="mb-4">{{ $internship->name }}</h1>
 
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
     @if(auth()->user()->hasAnyRole(['admin', 'internship_manager']))
         <a href="{{ route('themes.index', $internship->id) }}" class="btn btn-secondary mb-3">
             Manage Themes
@@ -26,12 +40,24 @@
             </a>
         @else
             @php
-                $hasApplied = \App\Models\InternshipApplication::where('internship_id', $internship->id)
+                $application = \App\Models\InternshipApplication::where('internship_id', $internship->id)
                     ->where('user_id', auth()->id())
-                    ->exists();
+                    ->first();
             @endphp
-            @if($hasApplied)
-                <span class="btn btn-warning mb-3" disabled>Application Submitted</span>
+            @if($application)
+                @if($application->status === 'pending')
+                    <a href="{{ route('applications.student-view', $internship->id) }}" class="btn btn-warning mb-3">
+                        Application Submitted (Pending)
+                    </a>
+                @elseif($application->status === 'approved')
+                    <a href="{{ route('applications.student-view', $internship->id) }}" class="btn btn-success mb-3">
+                        Application Approved
+                    </a>
+                @elseif($application->status === 'rejected')
+                    <a href="{{ route('applications.student-view', $internship->id) }}" class="btn btn-danger mb-3">
+                        Application Rejected
+                    </a>
+                @endif
             @else
                 <a href="{{ route('applications.create', $internship->id) }}" class="btn btn-primary mb-3">
                     Apply Now

@@ -65,6 +65,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('applications.index');
     Route::get('/applications/{application}', [InternshipApplicationController::class, 'show'])
         ->name('applications.show');
+    Route::get('/my-application', [InternshipApplicationController::class, 'studentView'])
+        ->name('applications.student-view');
     Route::post('/applications/{application}/approve', [InternshipApplicationController::class, 'approve'])
         ->name('applications.approve');
     Route::post('/applications/{application}/reject', [InternshipApplicationController::class, 'reject'])

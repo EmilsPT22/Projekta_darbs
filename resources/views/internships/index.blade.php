@@ -17,7 +17,7 @@
     @else
         <div class="row">
             @foreach($internships as $internship)
-                <div class="col-md-6 mb-4">
+                <div class="col-12 mb-4">
                     <div class="card h-100 bg-dark border-secondary">
                         <div class="card-header border-secondary">
                             <h5 class="mb-0">{{ $internship->name }}</h5>

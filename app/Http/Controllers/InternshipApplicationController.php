@@ -13,7 +13,16 @@ class InternshipApplicationController extends Controller
      */
     public function create(Internship $internship)
     {
-        // Check if student already applied or is enrolled
+        $user = auth()->user();
+
+        // Check if student is already enrolled in any internship
+        $existingInternship = $user->internships()->first();
+        if ($existingInternship) {
+            return redirect()->route('internships.show', $internship->id)
+                ->with('error', 'You are already enrolled in an internship: ' . $existingInternship->name);
+        }
+
+        // Check if student already applied to this internship
         $existingApplication = InternshipApplication::where('internship_id', $internship->id)
             ->where('user_id', auth()->id())
             ->first();
@@ -36,6 +45,15 @@ class InternshipApplicationController extends Controller
      */
     public function store(Request $request, Internship $internship)
     {
+        $user = auth()->user();
+
+        // Check if student is already enrolled in any internship
+        $existingInternship = $user->internships()->first();
+        if ($existingInternship) {
+            return redirect()->route('internships.show', $internship->id)
+                ->with('error', 'You are already enrolled in an internship: ' . $existingInternship->name);
+        }
+
         $request->validate([
             'cover_letter' => 'nullable|string|max:2000',
             'motivation' => 'required|string|max:2000',
@@ -93,6 +111,13 @@ class InternshipApplicationController extends Controller
             abort(403);
         }
 
+        // Check if student is already enrolled in another internship
+        $existingInternship = $application->student->internships()->first();
+        if ($existingInternship && $existingInternship->id !== $internship->id) {
+            return redirect()->route('applications.index', $internship->id)
+                ->with('error', 'Student is already enrolled in another internship: ' . $existingInternship->name);
+        }
+
         $application->update([
             'status' => 'approved',
             'manager_comment' => request('manager_comment'),
@@ -130,5 +155,22 @@ class InternshipApplicationController extends Controller
 
         return redirect()->route('applications.index', $internship->id)
             ->with('success', 'Application rejected.');
+    }
+
+    /**
+     * Show student their own application
+     */
+    public function studentView(Internship $internship)
+    {
+        $application = InternshipApplication::where('internship_id', $internship->id)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (!$application) {
+            return redirect()->route('internships.show', $internship->id)
+                ->with('error', 'You have not applied to this internship.');
+        }
+
+        return view('applications.student-view', compact('internship', 'application'));
     }
 }

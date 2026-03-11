@@ -14,46 +14,77 @@
         </div>
     @endif
 
-    @if($applications->isEmpty())
-        <div class="alert alert-info">No applications yet.</div>
-    @else
-        <div class="table-responsive">
-            <table class="table table-hover table-dark">
-                <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th>Applied Date</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($applications as $application)
-                        <tr>
-                            <td>
-                                <strong>{{ $application->student->name }}</strong><br>
-                                <small class="text-muted">{{ $application->student->email }}</small>
-                            </td>
-                            <td>{{ $application->created_at->format('d/m/Y H:i') }}</td>
-                            <td>
-                                @if($application->status === 'pending')
-                                    <span class="badge bg-warning">Pending</span>
-                                @elseif($application->status === 'approved')
-                                    <span class="badge bg-success">Approved</span>
-                                @else
-                                    <span class="badge bg-danger">Rejected</span>
-                                @endif
-                            </td>
-                            <td>
-                                <a href="{{ route('applications.show', [$internship->id, $application->id]) }}" class="btn btn-info btn-sm">
-                                    View Details
-                                </a>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
         </div>
     @endif
+
+    {{-- Tabs --}}
+    <ul class="nav nav-tabs mb-4" id="applicationTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button">
+                All Applications ({{ $applications->count() }})
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button">
+                Pending ({{ $applications->where('status', 'pending')->count() }})
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="approved-tab" data-bs-toggle="tab" data-bs-target="#approved" type="button">
+                Approved ({{ $applications->where('status', 'approved')->count() }})
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected" type="button">
+                Rejected ({{ $applications->where('status', 'rejected')->count() }})
+            </button>
+        </li>
+    </ul>
+
+    {{-- Tab Content --}}
+    <div class="tab-content" id="applicationTabsContent">
+        {{-- All Applications --}}
+        <div class="tab-pane fade show active" id="all" role="tabpanel">
+            @if($applications->isEmpty())
+                <div class="alert alert-info">No applications yet.</div>
+            @else
+                @include('applications.partials.applications-table', ['applications' => $applications, 'internship' => $internship])
+            @endif
+        </div>
+
+        {{-- Pending Applications --}}
+        <div class="tab-pane fade" id="pending" role="tabpanel">
+            @php $pending = $applications->where('status', 'pending'); @endphp
+            @if($pending->isEmpty())
+                <div class="alert alert-info">No pending applications.</div>
+            @else
+                @include('applications.partials.applications-table', ['applications' => $pending, 'internship' => $internship])
+            @endif
+        </div>
+
+        {{-- Approved Applications --}}
+        <div class="tab-pane fade" id="approved" role="tabpanel">
+            @php $approved = $applications->where('status', 'approved'); @endphp
+            @if($approved->isEmpty())
+                <div class="alert alert-info">No approved applications.</div>
+            @else
+                @include('applications.partials.applications-table', ['applications' => $approved, 'internship' => $internship])
+            @endif
+        </div>
+
+        {{-- Rejected Applications --}}
+        <div class="tab-pane fade" id="rejected" role="tabpanel">
+            @php $rejected = $applications->where('status', 'rejected'); @endphp
+            @if($rejected->isEmpty())
+                <div class="alert alert-info">No rejected applications.</div>
+            @else
+                @include('applications.partials.applications-table', ['applications' => $rejected, 'internship' => $internship])
+            @endif
+        </div>
+    </div>
 </div>
 @endsection
