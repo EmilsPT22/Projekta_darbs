@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Internship;
 use App\Models\InternshipApplication;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class InternshipApplicationController extends Controller
 {
@@ -41,13 +40,7 @@ class InternshipApplicationController extends Controller
             'cover_letter' => 'nullable|string|max:2000',
             'motivation' => 'required|string|max:2000',
             'phone' => 'nullable|string|max:20',
-            'cv' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
         ]);
-
-        $cvPath = null;
-        if ($request->hasFile('cv')) {
-            $cvPath = $request->file('cv')->store('cvs', 'public');
-        }
 
         InternshipApplication::create([
             'internship_id' => $internship->id,
@@ -55,7 +48,6 @@ class InternshipApplicationController extends Controller
             'cover_letter' => $request->cover_letter,
             'motivation' => $request->motivation,
             'phone' => $request->phone,
-            'cv_path' => $cvPath,
             'status' => 'pending',
         ]);
 

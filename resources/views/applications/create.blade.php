@@ -43,15 +43,6 @@
             @enderror
         </div>
 
-        <div class="mb-3">
-            <label for="cv" class="form-label">Upload CV (Optional)</label>
-            <input type="file" name="cv" id="cv" class="form-control" accept=".pdf,.doc,.docx">
-            <small class="text-muted">Accepted formats: PDF, DOC, DOCX. Max size: 2MB</small>
-            @error('cv')
-                <div class="text-danger small mt-1">{{ $message }}</div>
-            @enderror
-        </div>
-
         <div class="d-flex gap-2">
             <button type="submit" class="btn btn-primary">Submit Application</button>
             <a href="{{ route('internships.show', $internship->id) }}" class="btn btn-secondary">Cancel</a>

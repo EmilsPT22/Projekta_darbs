@@ -58,10 +58,5 @@ class User extends Authenticatable
         return $this->belongsToMany(Theme::class)
             ->withPivot(['assigned_hours', 'used_hours'])
             ->withTimestamps();
-    }   
-
-
-    
-
-
+    }
 }

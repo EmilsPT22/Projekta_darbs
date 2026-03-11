@@ -18,7 +18,6 @@ return new class extends Migration
             $table->text('cover_letter')->nullable();
             $table->text('motivation')->nullable();
             $table->string('phone')->nullable();
-            $table->string('cv_path')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->text('manager_comment')->nullable();
             $table->timestamps();

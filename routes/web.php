@@ -5,11 +5,16 @@ use App\Http\Controllers\InternshipController;
 use App\Http\Controllers\DailyEntryController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\InternshipApplicationController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('home');
 });
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('internships', InternshipController::class);
@@ -29,6 +34,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('profile.password');
         })->name('profile.password');
 
+    // Admin only routes
+    Route::prefix('admin')->group(function () {
+        Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');
+        Route::get('/users/{user}', [UserController::class, 'show'])->name('admin.users.show');
+        Route::get('/users/{user}/edit-roles', [UserController::class, 'editRoles'])->name('admin.users.edit-roles');
+        Route::post('/users/{user}/update-roles', [UserController::class, 'updateRoles'])->name('admin.users.update-roles');
+        Route::post('/users/{user}/remove-role', [UserController::class, 'removeRole'])->name('admin.users.remove-role');
+    });
 
     Route::prefix('internships/{internship}')->group(function () {
 

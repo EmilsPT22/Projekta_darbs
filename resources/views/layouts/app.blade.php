@@ -16,18 +16,18 @@
 
         <a class="navbar-brand" href="{{ url('/') }}">Home</a>
 
-        <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-target="#navbarNav">
+        <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
            <ul class="navbar-nav ms-auto text-right">
                 @auth
+                    @if(auth()->user()->hasRole('admin'))
                     <li class="nav-item">
-                        <span class="nav-link text-muted small">
-                            {{ str_replace('_', ' ', ucfirst(auth()->user()->getRoleNames()->first())) }}
-                        </span>
+                        <a class="nav-link" href="{{ route('admin.users.index') }}">Users</a>
                     </li>
+                    @endif
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('internships.index') }}">Internships</a>
                     </li>
@@ -39,6 +39,11 @@
                             @csrf
                             <button type="submit" class="nav-link btn btn-link">Log Out</button>
                         </form>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link text-muted small border-start border-secondary ps-3">
+                            {{ str_replace('_', ' ', ucfirst(auth()->user()->getRoleNames()->first())) }}
+                        </span>
                     </li>
                 @else
                     <li class="nav-item">

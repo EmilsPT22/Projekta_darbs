@@ -15,7 +15,6 @@ class InternshipApplication extends Model
         'cover_letter',
         'motivation',
         'phone',
-        'cv_path',
         'status',
         'manager_comment',
     ];

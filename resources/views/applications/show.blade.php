@@ -37,15 +37,6 @@
                         <h6>Motivation</h6>
                         <p class="text-muted">{{ $application->motivation }}</p>
                     </div>
-
-                    @if($application->cv_path)
-                        <div class="mb-3">
-                            <h6>CV</h6>
-                            <a href="{{ Storage::url($application->cv_path) }}" target="_blank" class="btn btn-outline-light btn-sm">
-                                Download CV
-                            </a>
-                        </div>
-                    @endif
                 </div>
             </div>
         </div>

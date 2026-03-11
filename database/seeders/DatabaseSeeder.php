@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             TeacherUserSeeder::class,
         ]);
 
-        User::factory(10)->create();
+        // Only create students
+        User::factory(10)->student()->create();
     }
 }
