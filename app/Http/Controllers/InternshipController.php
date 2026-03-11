@@ -11,10 +11,13 @@ class InternshipController extends Controller
 {
     public function index()
     {
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'internship_manager'])) {
             $internships = Internship::all();
         } elseif (auth()->user()->hasRole('teacher')) {
             // Teachers can view all internships
+            $internships = Internship::all();
+        } elseif (auth()->user()->hasRole('student')) {
+            // Students see all internships (not just assigned ones)
             $internships = Internship::all();
         } else {
             $internships = auth()->user()->internships;
@@ -50,17 +53,18 @@ class InternshipController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->hasRole('student') && !$internship->students->contains($user->id)) {
-            abort(403);
-        }
+        // Students can view any internship details (not just enrolled ones)
+        // Only block if student tries to access and isn't enrolled AND isn't viewing details
+        // Actually, let students view all internship details
 
         $addedStudents = $internship->students;
         $users = collect();
 
-        if ($user->hasRole('admin')) {
-            $users = User::whereDoesntHave('roles', function ($query) {
-                $query->where('name', 'admin');
-            })->whereNotIn('id', $addedStudents->pluck('id'))->get();
+        if ($user->hasAnyRole(['admin', 'internship_manager'])) {
+            // Get users who are students only (not teachers, admins, or managers)
+            $users = User::role('student')
+                ->whereNotIn('id', $addedStudents->pluck('id'))
+                ->get();
         } elseif ($user->hasRole('teacher')) {
             // Teachers can view students but not manage them
             $users = $addedStudents;
@@ -135,7 +139,7 @@ class InternshipController extends Controller
 
     private function authorizeAdmin()
     {
-        if (!auth()->user()->hasRole('admin')) {
+        if (!auth()->user()->hasAnyRole(['admin', 'internship_manager'])) {
             abort(403);
         }
     }

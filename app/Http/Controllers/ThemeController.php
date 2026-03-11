@@ -10,7 +10,7 @@ class ThemeController extends Controller
 {
     private function authorizeAdmin()
     {
-        if (!auth()->user()->hasRole('admin')) {
+        if (!auth()->user()->hasAnyRole(['admin', 'internship_manager'])) {
             abort(403);
         }
     }
@@ -27,8 +27,8 @@ class ThemeController extends Controller
 
     public function index(Internship $internship)
     {
-        // Admin and teacher can view themes
-        if (!auth()->user()->hasAnyRole(['admin', 'teacher'])) {
+        // Admin, internship manager, and teacher can view themes
+        if (!auth()->user()->hasAnyRole(['admin', 'internship_manager', 'teacher'])) {
             abort(403);
         }
 

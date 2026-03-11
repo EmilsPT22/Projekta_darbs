@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\InternshipController;
 use App\Http\Controllers\DailyEntryController;
 use App\Http\Controllers\ThemeController;
+use App\Http\Controllers\InternshipApplicationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -41,6 +42,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/entries/student/{student}', [DailyEntryController::class, 'studentEntries'])
         ->name('entries.student');
+
+    // Application routes
+    Route::get('/apply', [InternshipApplicationController::class, 'create'])
+        ->name('applications.create');
+    Route::post('/apply', [InternshipApplicationController::class, 'store'])
+        ->name('applications.store');
+    Route::get('/applications', [InternshipApplicationController::class, 'index'])
+        ->name('applications.index');
+    Route::get('/applications/{application}', [InternshipApplicationController::class, 'show'])
+        ->name('applications.show');
+    Route::post('/applications/{application}/approve', [InternshipApplicationController::class, 'approve'])
+        ->name('applications.approve');
+    Route::post('/applications/{application}/reject', [InternshipApplicationController::class, 'reject'])
+        ->name('applications.reject');
 
      Route::get('/themes', [ThemeController::class, 'index'])->name('themes.index');
     Route::get('/themes/create', [ThemeController::class, 'create'])->name('themes.create');

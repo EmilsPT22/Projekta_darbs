@@ -27,7 +27,7 @@
         <table class="table table-hover table-dark">
             <thead>
                 <tr>
-                    @if(auth()->user()->hasAnyRole(['admin', 'teacher']))
+                    @if(auth()->user()->hasAnyRole(['admin', 'internship_manager', 'teacher']))
                         <th>Student</th>
                     @endif
                     <th>Date</th>
@@ -35,7 +35,7 @@
                     <th>Location</th>
                     <th>Hours</th>
                     <th>Intern Comment</th>
-                    @if(auth()->user()->hasAnyRole(['admin', 'teacher']))
+                    @if(auth()->user()->hasAnyRole(['admin', 'internship_manager', 'teacher']))
                         <th>Admin Comment</th>
                         <th>Grade</th>
                         @if(auth()->user()->hasRole('admin'))
@@ -48,7 +48,7 @@
             <tbody>
                 @forelse($entries as $entry)
                     <tr>
-                        @if(auth()->user()->hasAnyRole(['admin', 'teacher']))
+                        @if(auth()->user()->hasAnyRole(['admin', 'internship_manager', 'teacher']))
                             <td>{{ $entry->user->name }}</td>
                         @endif
                         <td>{{ $entry->date }}</td>
@@ -59,7 +59,7 @@
                         <td>{{ $entry->credit_hours }}</td>
                         <td>{{ $entry->intern_comment ?? '-' }}</td>
 
-                        @if(auth()->user()->hasAnyRole(['admin', 'teacher']))
+                        @if(auth()->user()->hasAnyRole(['admin', 'internship_manager', 'teacher']))
                             <td>
                                 @if($entry->admin_comment)
                                     <small>{{ Str::limit($entry->admin_comment, 50) }}</small>
@@ -74,7 +74,7 @@
                                     <span class="text-muted">-</span>
                                 @endif
                             </td>
-                            @if(auth()->user()->hasAnyRole(['admin', 'teacher']))
+                            @if(auth()->user()->hasAnyRole(['admin', 'internship_manager']))
                             <td>
                                 <a href="{{ route('entries.edit', [$internship->id, $entry->id]) }}" class="btn btn-warning btn-sm">
                                     @if(auth()->user()->hasRole('admin'))
@@ -89,7 +89,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ auth()->user()->hasAnyRole(['admin', 'teacher']) ? '8' : '5' }}" class="text-center text-muted py-4">
+                        <td colspan="{{ auth()->user()->hasAnyRole(['admin', 'internship_manager', 'teacher']) ? '8' : '5' }}" class="text-center text-muted py-4">
                             No entries yet
                         </td>
                     </tr>

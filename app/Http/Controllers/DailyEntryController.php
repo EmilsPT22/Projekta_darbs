@@ -23,7 +23,7 @@ class DailyEntryController extends Controller
                 ->where('user_id', $user->id)
                 ->get();
         } else {
-            // Admin and teacher can view all entries
+            // Admin, internship manager, and teacher can view all entries
             $entries = DailyEntry::where('internship_id', $internship->id)->get();
         }
 
@@ -43,7 +43,7 @@ class DailyEntryController extends Controller
                 ->where('user_id', $user->id)
                 ->get();
         } else {
-            // Admin and teacher must specify which student's calendar to view
+            // Admin, internship manager, and teacher must specify which student's calendar to view
             if (!$internship->students->contains($student->id)) {
                 abort(403);
             }
@@ -169,8 +169,8 @@ public function create(Internship $internship)
 
     public function studentEntries(Internship $internship, User $student)
     {
-        // Admin and teacher can view student entries
-        if (!auth()->user()->hasAnyRole(['admin', 'teacher'])) {
+        // Admin, internship manager, and teacher can view student entries
+        if (!auth()->user()->hasAnyRole(['admin', 'internship_manager', 'teacher'])) {
             abort(403);
         }
 
@@ -185,8 +185,8 @@ public function create(Internship $internship)
     {
         $user = auth()->user();
         
-        // Admin can edit everything, teacher can only grade
-        if (!$user->hasAnyRole(['admin', 'teacher'])) {
+        // Admin and internship manager can edit/grade entries
+        if (!$user->hasAnyRole(['admin', 'internship_manager'])) {
             abort(403);
         }
 
@@ -207,8 +207,8 @@ public function create(Internship $internship)
                 'admin_comment' => $request->admin_comment,
                 'grade' => $request->grade,
             ]);
-        } elseif ($user->hasRole('teacher')) {
-            // Teachers can only change the grade
+        } elseif ($user->hasRole('internship_manager')) {
+            // Internship manager can only change the grade
             $request->validate([
                 'grade' => 'required|integer|min:1|max:10',
             ]);

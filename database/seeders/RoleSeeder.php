@@ -24,17 +24,33 @@ class RoleSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'view all entries']);
         Permission::firstOrCreate(['name' => 'edit entries']);
         Permission::firstOrCreate(['name' => 'add feedback']);
+        Permission::firstOrCreate(['name' => 'grade entries']);
+        Permission::firstOrCreate(['name' => 'manage students']);
+        Permission::firstOrCreate(['name' => 'manage themes']);
 
         $admin = Role::firstOrCreate(['name' => 'admin']);
+        $internshipManager = Role::firstOrCreate(['name' => 'internship_manager']);
         $teacher = Role::firstOrCreate(['name' => 'teacher']);
         $student = Role::firstOrCreate(['name' => 'student']);
 
         $admin->givePermissionTo(Permission::all());
 
+        $internshipManager->givePermissionTo([
+            'view internships',
+            'create internships',
+            'edit internships',
+            'delete internships',
+            'view all entries',
+            'edit entries',
+            'add feedback',
+            'grade entries',
+            'manage students',
+            'manage themes',
+        ]);
+
         $teacher->givePermissionTo([
             'view internships',
             'view all entries',
-            'add feedback',
         ]);
 
         $student->givePermissionTo('view internships');

@@ -4,7 +4,7 @@
 <div class="container">
     <h1>Themes for Internship: {{ $internship->name }}</h1>
 
-    @if(auth()->user()->hasRole('admin'))
+    @if(auth()->user()->hasAnyRole(['admin', 'internship_manager']))
         <a href="{{ route('themes.create', $internship->id) }}" class="btn btn-primary mb-3">Add Theme</a>
     @endif
 
@@ -16,7 +16,7 @@
                     <small>{{ $theme->max_hours }} hours available</small>
                 </div>
 
-                @if(auth()->user()->hasRole('admin'))
+                @if(auth()->user()->hasAnyRole(['admin', 'internship_manager']))
                 <div>
                     <a href="{{ route('themes.edit', [$internship->id, $theme->id]) }}"
                        class="btn btn-warning btn-sm">Edit</a>

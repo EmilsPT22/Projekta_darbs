@@ -2,11 +2,14 @@
 
 @section('content')
 <div class="container py-4">
-    <h1 class="mb-4">Internship Details</h1>
+    <h1 class="mb-4">{{ $internship->name }}</h1>
 
-    @if(auth()->user()->hasRole('admin'))
+    @if(auth()->user()->hasAnyRole(['admin', 'internship_manager']))
         <a href="{{ route('themes.index', $internship->id) }}" class="btn btn-secondary mb-3">
             Manage Themes
+        </a>
+        <a href="{{ route('applications.index', $internship->id) }}" class="btn btn-info mb-3 ms-2">
+            View Applications
         </a>
     @endif
 
@@ -16,16 +19,65 @@
         </a>
     @endif
 
-    <ul class="list-group mb-4">
-        <li class="list-group-item"><strong>Name:</strong> {{ $internship->name }}</li>
-        <li class="list-group-item"><strong>Description:</strong> {{ $internship->description }}</li>
-        <li class="list-group-item"><strong>Length:</strong> {{ $internship->length }} months</li>
-        <li class="list-group-item"><strong>Start Date:</strong> {{ \Carbon\Carbon::parse($internship->start_date)->format('d/m/Y') }}</li>
-        <li class="list-group-item"><strong>End Date:</strong> {{ \Carbon\Carbon::parse($internship->end_date)->format('d/m/Y') }}</li>
-    </ul>
+    @if(auth()->user()->hasRole('student'))
+        @if($internship->students->contains(auth()->id()))
+            <a href="{{ route('entries.index', $internship->id) }}" class="btn btn-success mb-3">
+                Go to My Journal
+            </a>
+        @else
+            @php
+                $hasApplied = \App\Models\InternshipApplication::where('internship_id', $internship->id)
+                    ->where('user_id', auth()->id())
+                    ->exists();
+            @endphp
+            @if($hasApplied)
+                <span class="btn btn-warning mb-3" disabled>Application Submitted</span>
+            @else
+                <a href="{{ route('applications.create', $internship->id) }}" class="btn btn-primary mb-3">
+                    Apply Now
+                </a>
+            @endif
+        @endif
+    @endif
 
-    {{-- ADMIN & TEACHER: View Students --}}
-    @if(auth()->user()->hasAnyRole(['admin', 'teacher']))
+    <div class="card bg-dark border-secondary mb-4">
+        <div class="card-header border-secondary">
+            <h5 class="mb-0">Description</h5>
+        </div>
+        <div class="card-body">
+            <p class="card-text">{{ $internship->description }}</p>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-dark border-secondary h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Duration</h6>
+                    <h4>{{ $internship->length }} months</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark border-secondary h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Start Date</h6>
+                    <h4>{{ \Carbon\Carbon::parse($internship->start_date)->format('d/m/Y') }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark border-secondary h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">End Date</h6>
+                    <h4>{{ \Carbon\Carbon::parse($internship->end_date)->format('d/m/Y') }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ADMIN, INTERNSHIP MANAGER & TEACHER: View Students --}}
+    @if(auth()->user()->hasAnyRole(['admin', 'internship_manager', 'teacher']))
 
         <h2 class="mb-3">Students</h2>
 
@@ -45,7 +97,7 @@
                                 View Journal
                             </a>
 
-                            @if(auth()->user()->hasRole('admin'))
+                            @if(auth()->user()->hasAnyRole(['admin', 'internship_manager']))
                             <form
                                 action="{{ route('internships.removeStudent', ['internship' => $internship->id, 'id' => $student->id]) }}"
                                 method="POST"
@@ -53,7 +105,7 @@
                             >
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Remove this student?')">
                                     Remove
                                 </button>
                             </form>
@@ -71,7 +123,7 @@
     </a>
 </div>
 
-@if(auth()->user()->hasRole('admin'))
+@if(auth()->user()->hasAnyRole(['admin', 'internship_manager']))
     <h2 class="mb-3">Add Students</h2>
 
     @if($users->isEmpty())
