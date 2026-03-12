@@ -12,7 +12,7 @@ class ThemeUnitTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_remaining_hours_for_user_is_calculated_correctly()
+    public function test_remaining_hours_for_user_is_calculated_correctly(): void
     {
         $internship = Internship::factory()->create();
 
@@ -29,9 +29,6 @@ class ThemeUnitTest extends TestCase
             'used_hours' => 15,
         ]);
 
-        $this->assertEquals(
-            25,
-            $theme->remainingHoursForUser($user->id)
-        );
+        $this->assertEquals(25, $theme->remainingHoursForUser($user->id));
     }
 }
