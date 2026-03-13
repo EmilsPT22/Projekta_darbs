@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Internship;
 use App\Models\Theme;
 use App\Models\InternshipApplication;
+use App\Models\ClassGroup;
 use Illuminate\Http\Request;
 use App\Models\User;
 
@@ -60,18 +61,25 @@ class InternshipController extends Controller
 
         $addedStudents = $internship->students;
         $users = collect();
+        $classGroups = collect();
 
         if ($user->hasAnyRole(['admin', 'internship_manager'])) {
             // Get users who are students only (not teachers, admins, or managers)
+            // Only include students who have a class assigned
             $users = User::role('student')
+                ->whereNotNull('class_group_id')
                 ->whereNotIn('id', $addedStudents->pluck('id'))
                 ->get();
+
+            // Get all class groups with their students count
+            $classGroups = ClassGroup::with('students')->get();
         } elseif ($user->hasRole('teacher')) {
             // Teachers can view students but not manage them
             $users = $addedStudents;
+            $classGroups = ClassGroup::with('students')->get();
         }
 
-        return view('internships.show', compact('internship', 'users', 'addedStudents'));
+        return view('internships.show', compact('internship', 'users', 'addedStudents', 'classGroups'));
     }
 
     public function edit(Internship $internship)
@@ -133,6 +141,45 @@ class InternshipController extends Controller
         }
 
         return back()->with('success', 'Student added successfully.');
+    }
+
+    public function addClassGroup(Internship $internship, ClassGroup $classgroup)
+    {
+        $this->authorizeAdmin();
+
+        $students = $classgroup->students;
+        $addedCount = 0;
+        $skippedCount = 0;
+
+        foreach ($students as $student) {
+            // Skip if already in this internship
+            if ($internship->students()->where('user_id', $student->id)->exists()) {
+                $skippedCount++;
+                continue;
+            }
+
+            // Check if student is already in another internship
+            $existingInternship = $student->internships()->first();
+            if ($existingInternship && $existingInternship->id !== $internship->id) {
+                $skippedCount++;
+                continue;
+            }
+
+            $internship->students()->attach($student->id);
+
+            // Assign themes to student
+            $themes = Theme::where('internship_id', $internship->id)->get();
+            foreach ($themes as $theme) {
+                $theme->users()->attach($student->id, [
+                    'assigned_hours' => $theme->max_hours,
+                    'used_hours' => 0,
+                ]);
+            }
+
+            $addedCount++;
+        }
+
+        return back()->with('success', "Added {$addedCount} students from class. Skipped {$skippedCount} (already enrolled or in another internship).");
     }
 
     public function removeStudent(Internship $internship, $id)

@@ -6,6 +6,7 @@ use App\Http\Controllers\DailyEntryController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\InternshipApplicationController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ClassGroupController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -41,9 +42,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/users/{user}/edit-roles', [UserController::class, 'editRoles'])->name('admin.users.edit-roles');
         Route::post('/users/{user}/update-roles', [UserController::class, 'updateRoles'])->name('admin.users.update-roles');
         Route::post('/users/{user}/remove-role', [UserController::class, 'removeRole'])->name('admin.users.remove-role');
+        
+        // Class group management
+        Route::resource('classgroups', ClassGroupController::class);
+        Route::post('classgroups/{classgroup}/assign-students', [ClassGroupController::class, 'assignStudents'])
+            ->name('classgroups.assign-students');
     });
 
     Route::prefix('internships/{internship}')->group(function () {
+
+    Route::post('addClassGroup/{classgroup}',
+        [InternshipController::class, 'addClassGroup']
+    )->name('internships.addClassGroup');
 
     Route::get('/entries', [DailyEntryController::class, 'index'])->name('entries.index');
     Route::get('/entries/calendar/{student}', [DailyEntryController::class, 'calendar'])->name('entries.calendar');

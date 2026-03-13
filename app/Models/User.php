@@ -59,4 +59,9 @@ class User extends Authenticatable
             ->withPivot(['assigned_hours', 'used_hours'])
             ->withTimestamps();
     }
+
+    public function classGroup()
+    {
+        return $this->belongsTo(ClassGroup::class);
+    }
 }

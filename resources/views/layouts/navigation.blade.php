@@ -15,6 +15,22 @@
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                             {{ __('Dashboard') }}
                         </x-nav-link>
+                        
+                        @if(Auth::check() && Auth::user()->hasAnyRole(['admin', 'internship_manager', 'teacher']))
+                            <x-nav-link :href="route('internships.index')" :active="request()->routeIs('internships.*')">
+                                {{ __('Internships') }}
+                            </x-nav-link>
+                            
+                            @if(Auth::user()->hasAnyRole(['admin', 'internship_manager']))
+                                <x-nav-link :href="route('classgroups.index')" :active="request()->routeIs('classgroups.*')">
+                                    {{ __('Classes') }}
+                                </x-nav-link>
+                                
+                                <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                                    {{ __('Users') }}
+                                </x-nav-link>
+                            @endif
+                        @endif
                     </div>
                 </div>
 

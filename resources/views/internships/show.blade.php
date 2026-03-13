@@ -152,13 +152,32 @@
 @if(auth()->user()->hasAnyRole(['admin', 'internship_manager']))
     <h2 class="mb-3">Add Students</h2>
 
+    {{-- Filter Individual Students by Class --}}
+    @if($classGroups->isNotEmpty())
+        <div class="mb-3">
+            <label for="filter_class" class="form-label">Filter students by class:</label>
+            <select class="form-select w-auto d-inline-block" id="filter_class">
+                <option value="">All Classes</option>
+                @foreach($classGroups as $classGroup)
+                    <option value="{{ $classGroup->id }}">{{ $classGroup->name }}</option>
+                @endforeach
+            </select>
+        </div>
+    @endif
+
     @if($users->isEmpty())
         <p>All students have been added.</p>
     @else
-        <ul class="list-group mb-4">
+        <ul class="list-group mb-4" id="students_list">
             @foreach($users as $user)
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    {{ $user->name }} ({{ $user->email }})
+                <li class="list-group-item d-flex justify-content-between align-items-center student-item"
+                    data-class-group-id="{{ $user->class_group_id }}">
+                    <div>
+                        {{ $user->name }} ({{ $user->email }})
+                        @if($user->classGroup)
+                            <span class="badge bg-info ms-2">{{ $user->classGroup->name }}</span>
+                        @endif
+                    </div>
 
                     <form
                         action="{{ route('internships.addStudent', ['internship' => $internship->id, 'id' => $user->id]) }}"
@@ -180,6 +199,34 @@
 
 
 @section('scripts')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterSelect = document.getElementById('filter_class');
+        console.log('Filter select found:', !!filterSelect);
+        
+        if (!filterSelect) {
+            console.log('No filter select element found');
+            return;
+        }
+
+        filterSelect.addEventListener('change', function() {
+            const selectedClassId = String(this.value).trim();
+            const studentItems = document.querySelectorAll('.student-item');
+
+            console.log('Selected class ID:', selectedClassId);
+
+            studentItems.forEach(function(item) {
+                const itemClassId = String(item.getAttribute('data-class-group-id') || '').trim();
+                
+                if (!selectedClassId) {
+                    item.classList.remove('d-none');
+                } else if (itemClassId === selectedClassId) {
+                    item.classList.remove('d-none');
+                } else {
+                    item.classList.add('d-none');
+                }
+            });
+        });
+    });
+</script>
 @endsection
