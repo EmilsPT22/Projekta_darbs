@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\ClassGroup;
 use Spatie\Permission\Models\Role;
 use Illuminate\Http\Request;
 
@@ -90,5 +91,63 @@ class UserController extends Controller
         $user->removeRole($request->role);
 
         return back()->with('success', 'Role removed successfully.');
+    }
+
+    /**
+     * Show edit grade form (Admin/Teacher only)
+     */
+    public function editGrade(User $user)
+    {
+        if (!auth()->user()->hasAnyRole(['admin', 'teacher'])) {
+            abort(403);
+        }
+
+        $classGroups = ClassGroup::orderBy('grade_level')->get();
+
+        return view('admin.users.edit-grade', compact('user', 'classGroups'));
+    }
+
+    /**
+     * Update user grade (Admin/Teacher only)
+     */
+    public function updateGrade(Request $request, User $user)
+    {
+        if (!auth()->user()->hasAnyRole(['admin', 'teacher'])) {
+            abort(403);
+        }
+
+        $request->validate([
+            'class_group_id' => 'nullable|exists:class_groups,id',
+        ]);
+
+        $user->update([
+            'class_group_id' => $request->class_group_id,
+        ]);
+
+        // Redirect based on user role
+        if (auth()->user()->hasRole('teacher')) {
+            return redirect()->route('admin.students-grade')
+                ->with('success', 'Grade updated successfully.');
+        }
+
+        return redirect()->route('admin.users.show', $user->id)
+            ->with('success', 'Grade updated successfully.');
+    }
+
+    /**
+     * Show all students for grade management (Admin/Teacher only)
+     */
+    public function studentsForGrade()
+    {
+        if (!auth()->user()->hasAnyRole(['admin', 'teacher'])) {
+            abort(403);
+        }
+
+        $students = User::role('student')
+            ->with('classGroup')
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.users.students-for-grade', compact('students'));
     }
 }

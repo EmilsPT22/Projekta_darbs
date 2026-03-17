@@ -42,7 +42,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/users/{user}/edit-roles', [UserController::class, 'editRoles'])->name('admin.users.edit-roles');
         Route::post('/users/{user}/update-roles', [UserController::class, 'updateRoles'])->name('admin.users.update-roles');
         Route::post('/users/{user}/remove-role', [UserController::class, 'removeRole'])->name('admin.users.remove-role');
-        
+        Route::get('/users/{user}/edit-grade', [UserController::class, 'editGrade'])->name('admin.users.edit-grade');
+        Route::post('/users/{user}/update-grade', [UserController::class, 'updateGrade'])->name('admin.users.update-grade');
+        Route::get('/students-grade', [UserController::class, 'studentsForGrade'])->name('admin.students-grade');
+
         // Class group management
         Route::resource('classgroups', ClassGroupController::class);
         Route::post('classgroups/{classgroup}/assign-students', [ClassGroupController::class, 'assignStudents'])

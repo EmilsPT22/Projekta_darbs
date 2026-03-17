@@ -28,6 +28,11 @@
                         <a class="nav-link" href="{{ route('admin.users.index') }}">Users</a>
                     </li>
                     @endif
+                    @if(auth()->user()->hasAnyRole(['admin', 'teacher']))
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('admin.students-grade') }}">Manage Grades</a>
+                    </li>
+                    @endif
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('internships.index') }}">Internships</a>
                     </li>
