@@ -64,6 +64,26 @@ class UserFactory extends Factory
             $user->assignRole('student');
         });
     }
+
+    /**
+     * Indicate that the user should have the teacher role.
+     */
+    public function teacher(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->assignRole('teacher');
+        });
+    }
+
+    /**
+     * Indicate that the user should have the internship_manager role.
+     */
+    public function internshipManager(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->assignRole('internship_manager');
+        });
+    }
 }
 
 

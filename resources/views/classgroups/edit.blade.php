@@ -30,9 +30,25 @@
 
                 <div class="mb-3">
                     <label for="description" class="form-label">Description (optional)</label>
-                    <textarea class="form-control" id="description" name="description" 
+                    <textarea class="form-control" id="description" name="description"
                               rows="3">{{ old('description', $classgroup->description) }}</textarea>
                     @error('description')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label for="teacher_id" class="form-label">Assigned Teacher</label>
+                    <select class="form-select" id="teacher_id" name="teacher_id">
+                        <option value="">-- No Teacher Assigned --</option>
+                        @foreach(\App\Models\User::role('teacher')->orderBy('name')->get() as $teacher)
+                            <option value="{{ $teacher->id }}"
+                                    {{ old('teacher_id', $classgroup->teacher_id) == $teacher->id ? 'selected' : '' }}>
+                                {{ $teacher->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('teacher_id')
                         <div class="text-danger">{{ $message }}</div>
                     @enderror
                 </div>

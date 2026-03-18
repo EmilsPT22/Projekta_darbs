@@ -70,18 +70,18 @@
         <div class="col-md-6">
             <div class="card bg-dark border-secondary mb-4">
                 <div class="card-header border-secondary">
-                    <h5 class="mb-0">Student Grade</h5>
+                    <h5 class="mb-0">Student Class</h5>
                 </div>
                 <div class="card-body">
                     @if($user->classGroup)
-                        <p><strong>Current Grade:</strong> <span class="text-info">{{ $user->classGroup->grade_level }}</span> ({{ $user->classGroup->name }})</p>
+                        <p><strong>Current Class:</strong> <span class="text-info">{{ $user->classGroup->grade_level }}</span> ({{ $user->classGroup->name }})</p>
                     @else
-                        <p class="text-muted">No grade assigned yet.</p>
+                        <p class="text-muted">No class assigned yet.</p>
                     @endif
 
                     @if(auth()->user()->hasAnyRole(['admin', 'teacher']))
                         <a href="{{ route('admin.users.edit-grade', $user->id) }}" class="btn btn-warning btn-sm">
-                            {{ $user->classGroup ? 'Change Grade' : 'Assign Grade' }}
+                            {{ $user->classGroup ? 'Change Class' : 'Assign Class' }}
                         </a>
                     @endif
                 </div>

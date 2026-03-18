@@ -13,11 +13,17 @@ class ClassGroup extends Model
         'name',
         'grade_level',
         'description',
+        'teacher_id',
     ];
 
     public function students()
     {
         return $this->hasMany(User::class, 'class_group_id');
+    }
+
+    public function teacher()
+    {
+        return $this->belongsTo(User::class, 'teacher_id');
     }
 
     public function internships()

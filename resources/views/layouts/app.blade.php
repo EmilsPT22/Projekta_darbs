@@ -27,10 +27,24 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('admin.users.index') }}">Users</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('classgroups.index') }}">Classes</a>
+                    </li>
+                    @endif
+                    @if(auth()->user()->hasRole('teacher'))
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="teacherDropdown" role="button" data-bs-toggle="dropdown">
+                            My Classes
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ route('teacher.my-classes') }}">My Classes</a></li>
+                            <li><a class="dropdown-item" href="{{ route('teacher.my-students') }}">My Students</a></li>
+                        </ul>
+                    </li>
                     @endif
                     @if(auth()->user()->hasAnyRole(['admin', 'teacher']))
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('admin.students-grade') }}">Manage Grades</a>
+                        <a class="nav-link" href="{{ route('admin.students-grade') }}">Manage Classes</a>
                     </li>
                     @endif
                     <li class="nav-item">

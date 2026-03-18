@@ -150,4 +150,32 @@ class UserController extends Controller
 
         return view('admin.users.students-for-grade', compact('students'));
     }
+
+    /**
+     * Show teacher's assigned students (also accessible by admin).
+     */
+    public function myStudents()
+    {
+        if (!auth()->user()->hasAnyRole(['teacher', 'admin'])) {
+            abort(403);
+        }
+
+        // Admin sees all students, teacher sees only students in their assigned classes
+        if (auth()->user()->hasRole('admin')) {
+            $students = User::role('student')
+                ->with('classGroup')
+                ->orderBy('name')
+                ->get();
+        } else {
+            $students = User::role('student')
+                ->whereHas('classGroup', function($q) {
+                    $q->where('teacher_id', auth()->id());
+                })
+                ->with('classGroup')
+                ->orderBy('name')
+                ->get();
+        }
+
+        return view('teacher.my-students', compact('students'));
+    }
 }

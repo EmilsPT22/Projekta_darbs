@@ -23,6 +23,13 @@ class DailyEntry extends Model
         'org_supervisor_comment',
         'admin_comment',
         'grade',
+        'status',
+        'approved_by',
+        'approved_at',
+    ];
+
+    protected $casts = [
+        'approved_at' => 'datetime',
     ];
 
     public function internship()
@@ -38,5 +45,15 @@ class DailyEntry extends Model
     public function theme()
     {
         return $this->belongsTo(Theme::class);
+    }
+
+    public function student()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 }

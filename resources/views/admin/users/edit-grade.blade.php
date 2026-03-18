@@ -3,7 +3,7 @@
 @section('content')
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Change Grade for {{ $user->name }}</h2>
+        <h2 class="mb-0">Change Class for {{ $user->name }}</h2>
         <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-secondary">Back to User</a>
     </div>
 
@@ -24,9 +24,9 @@
                 @csrf
 
                 <div class="mb-3">
-                    <label for="class_group_id" class="form-label">Grade Level</label>
+                    <label for="class_group_id" class="form-label">Class/Grade</label>
                     <select class="form-select" id="class_group_id" name="class_group_id">
-                        <option value="">-- No Grade Assigned --</option>
+                        <option value="">-- No Class Assigned --</option>
                         @foreach($classGroups as $classGroup)
                             <option value="{{ $classGroup->id }}"
                                     {{ $user->class_group_id == $classGroup->id ? 'selected' : '' }}>
@@ -34,11 +34,11 @@
                             </option>
                         @endforeach
                     </select>
-                    <small class="text-muted">Select the grade this student is in.</small>
+                    <small class="text-muted">Select the class this student belongs to (e.g., 1st Grade - A).</small>
                 </div>
 
                 <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-primary">Save Grade</button>
+                    <button type="submit" class="btn btn-primary">Save Class</button>
                     <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-secondary">Cancel</a>
                 </div>
             </form>

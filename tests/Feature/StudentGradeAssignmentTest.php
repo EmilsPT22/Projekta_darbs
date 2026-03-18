@@ -19,7 +19,7 @@ class StudentGradeAssignmentTest extends TestCase
         $response = $this->actingAs($admin)->get("/admin/users/{$student->id}");
 
         $response->assertStatus(200);
-        $response->assertSee('Student Grade');
+        $response->assertSee('Student Class');
     }
 
     public function test_admin_can_view_edit_grade_page(): void
@@ -31,8 +31,8 @@ class StudentGradeAssignmentTest extends TestCase
         $response = $this->actingAs($admin)->get("/admin/users/{$student->id}/edit-grade");
 
         $response->assertStatus(200);
-        $response->assertSee('Save Grade');
-        $response->assertSee('1st Grade - A');
+        $response->assertSee('Save Class');
+        $response->assertSee('Class/Grade');
     }
 
     public function test_student_cannot_access_grade_management(): void

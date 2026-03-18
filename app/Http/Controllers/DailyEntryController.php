@@ -22,8 +22,17 @@ class DailyEntryController extends Controller
             $entries = DailyEntry::where('internship_id', $internship->id)
                 ->where('user_id', $user->id)
                 ->get();
+        } elseif ($user->hasRole('teacher')) {
+            // Teachers can see entries from students in their assigned classes
+            $studentIds = User::whereHas('classGroup', function($q) use ($user) {
+                $q->where('teacher_id', $user->id);
+            })->pluck('id');
+            
+            $entries = DailyEntry::where('internship_id', $internship->id)
+                ->whereIn('user_id', $studentIds)
+                ->get();
         } else {
-            // Admin, internship manager, and teacher can view all entries
+            // Admin can view all entries
             $entries = DailyEntry::where('internship_id', $internship->id)->get();
         }
 
@@ -184,10 +193,18 @@ public function create(Internship $internship)
     public function edit(Internship $internship, DailyEntry $entry)
     {
         $user = auth()->user();
-        
-        // Admin and internship manager can edit/grade entries
-        if (!$user->hasAnyRole(['admin', 'internship_manager'])) {
+
+        // Admin, internship manager, and teacher can edit/grade entries
+        if (!$user->hasAnyRole(['admin', 'internship_manager', 'teacher'])) {
             abort(403);
+        }
+
+        // Teachers can only edit entries from their students
+        if ($user->hasRole('teacher')) {
+            $student = $entry->student;
+            if (!$student->classGroup || $student->classGroup->teacher_id !== $user->id) {
+                abort(403);
+            }
         }
 
         return view('entries.edit', compact('internship', 'entry'));
@@ -215,6 +232,19 @@ public function create(Internship $internship)
 
             $entry->update([
                 'grade' => $request->grade,
+            ]);
+        } elseif ($user->hasRole('teacher')) {
+            // Teachers can approve/reject entries with comment
+            $request->validate([
+                'status' => 'required|in:approved,rejected',
+                'org_supervisor_comment' => 'nullable|string|max:1000',
+            ]);
+
+            $entry->update([
+                'status' => $request->status,
+                'org_supervisor_comment' => $request->org_supervisor_comment,
+                'approved_by' => $user->id,
+                'approved_at' => now(),
             ]);
         } else {
             abort(403);

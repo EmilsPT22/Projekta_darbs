@@ -52,6 +52,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('classgroups.assign-students');
     });
 
+    // Teacher routes
+    Route::prefix('teacher')->group(function () {
+        Route::get('/my-classes', [ClassGroupController::class, 'myClasses'])->name('teacher.my-classes');
+        Route::get('/my-students', [UserController::class, 'myStudents'])->name('teacher.my-students');
+    });
+
     Route::prefix('internships/{internship}')->group(function () {
 
     Route::post('addClassGroup/{classgroup}',

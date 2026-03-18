@@ -8,11 +8,6 @@ use Illuminate\Http\Request;
 
 class ClassGroupController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     /**
      * Display a listing of class groups.
      */
@@ -25,6 +20,27 @@ class ClassGroupController extends Controller
         $classGroups = ClassGroup::withCount('students')->get();
 
         return view('classgroups.index', compact('classGroups'));
+    }
+
+    /**
+     * Show teacher's assigned classes (also accessible by admin).
+     */
+    public function myClasses()
+    {
+        if (!auth()->user()->hasAnyRole(['teacher', 'admin'])) {
+            abort(403);
+        }
+
+        // Admin sees all classes, teacher sees only their assigned classes
+        if (auth()->user()->hasRole('admin')) {
+            $classGroups = ClassGroup::with(['teacher', 'students'])->get();
+        } else {
+            $classGroups = ClassGroup::where('teacher_id', auth()->id())
+                ->withCount('students')
+                ->get();
+        }
+
+        return view('teacher.my-classes', compact('classGroups'));
     }
 
     /**
@@ -52,6 +68,7 @@ class ClassGroupController extends Controller
             'name' => 'required|string|max:255',
             'grade_level' => 'required|string|max:50',
             'description' => 'nullable|string',
+            'teacher_id' => 'nullable|exists:users,id',
         ]);
 
         ClassGroup::create($request->all());
@@ -98,6 +115,7 @@ class ClassGroupController extends Controller
             'name' => 'required|string|max:255',
             'grade_level' => 'required|string|max:50',
             'description' => 'nullable|string',
+            'teacher_id' => 'nullable|exists:users,id',
         ]);
 
         $classgroup->update($request->all());

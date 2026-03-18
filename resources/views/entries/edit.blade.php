@@ -5,6 +5,8 @@
     <h2 class="mb-4">
         @if(auth()->user()->hasRole('admin'))
             Edit Entry – {{ $internship->name }}
+        @elseif(auth()->user()->hasRole('teacher'))
+            Approve/Reject Entry – {{ $internship->name }}
         @else
             Grade Entry – {{ $internship->name }}
         @endif
@@ -29,6 +31,17 @@
                 <div class="col-md-12">
                     <p><strong>Plan:</strong> {{ $entry->theme->name }}</p>
                     <p><strong>Intern Comment:</strong> {{ $entry->intern_comment ?? 'No comment' }}</p>
+                    @if($entry->status)
+                        <p><strong>Status:</strong> 
+                            @if($entry->status === 'approved')
+                                <span class="badge bg-success">Approved</span>
+                            @elseif($entry->status === 'rejected')
+                                <span class="badge bg-danger">Rejected</span>
+                            @else
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            @endif
+                        </p>
+                    @endif
                 </div>
             </div>
         </div>
@@ -48,6 +61,35 @@
         </div>
         @endif
 
+        @if(auth()->user()->hasRole('teacher'))
+        <div class="mb-3">
+            <label for="org_supervisor_comment" class="form-label">Teacher Comment</label>
+            <textarea name="org_supervisor_comment" id="org_supervisor_comment" class="form-control" rows="4" placeholder="Add your feedback or reason for rejection...">{{ old('org_supervisor_comment', $entry->org_supervisor_comment) }}</textarea>
+            @error('org_supervisor_comment')
+                <div class="text-danger small mt-1">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Decision</label>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="status" id="approve" value="approved" {{ old('status', $entry->status) === 'approved' ? 'checked' : '' }}>
+                <label class="form-check-label text-success" for="approve">
+                    Approve Entry
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="status" id="reject" value="rejected" {{ old('status', $entry->status) === 'rejected' ? 'checked' : '' }}>
+                <label class="form-check-label text-danger" for="reject">
+                    Reject Entry
+                </label>
+            </div>
+            @error('status')
+                <div class="text-danger small mt-1">{{ $message }}</div>
+            @enderror
+        </div>
+        @endif
+
         <div class="mb-3">
             <label for="grade" class="form-label">Grade (1-10)</label>
             <input type="number" name="grade" id="grade" class="form-control" min="1" max="10" value="{{ old('grade', $entry->grade) }}" placeholder="Enter grade" required>
@@ -59,6 +101,8 @@
         <button type="submit" class="btn btn-primary">
             @if(auth()->user()->hasRole('admin'))
                 Save Changes
+            @elseif(auth()->user()->hasRole('teacher'))
+                Save Decision
             @else
                 Save Grade
             @endif

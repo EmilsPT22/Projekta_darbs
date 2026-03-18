@@ -3,7 +3,7 @@
 @section('content')
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Manage Student Grades</h2>
+        <h2 class="mb-0">Manage Student Classes</h2>
         <a href="{{ route('dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
     </div>
 
@@ -25,7 +25,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
-                            <th>Current Grade</th>
+                            <th>Current Class</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -41,12 +41,12 @@
                                         <span class="badge bg-info">{{ $student->classGroup->grade_level }}</span>
                                         <span class="text-muted ms-1">{{ $student->classGroup->name }}</span>
                                     @else
-                                        <span class="text-muted">No grade assigned</span>
+                                        <span class="text-muted">No class assigned</span>
                                     @endif
                                 </td>
                                 <td>
                                     <a href="{{ route('admin.users.edit-grade', $student->id) }}" class="btn btn-warning btn-sm">
-                                        {{ $student->classGroup ? 'Change Grade' : 'Assign Grade' }}
+                                        {{ $student->classGroup ? 'Change Class' : 'Assign Class' }}
                                     </a>
                                 </td>
                             </tr>
