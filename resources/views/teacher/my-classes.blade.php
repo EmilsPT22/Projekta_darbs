@@ -38,7 +38,7 @@
                                     @endif
                                     <td>{{ $class->students_count ?? $class->students->count() }} students</td>
                                     <td>
-                                        <a href="{{ route('admin.students-grade') }}" class="btn btn-info btn-sm">
+                                        <a href="{{ route('admin.students-grade', ['class_group_id' => $class->id]) }}" class="btn btn-info btn-sm">
                                             View Students
                                         </a>
                                     </td>

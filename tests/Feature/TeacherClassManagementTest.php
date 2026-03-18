@@ -175,6 +175,35 @@ class TeacherClassManagementTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_admin_can_search_students_by_name(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $student1 = User::factory()->student()->create(['name' => 'John Doe']);
+        $student2 = User::factory()->student()->create(['name' => 'Jane Smith']);
+
+        $response = $this->actingAs($admin)->get('/admin/students-grade?search=John');
+
+        $response->assertStatus(200);
+        $response->assertSee('John Doe');
+        $response->assertDontSee('Jane Smith');
+    }
+
+    public function test_teacher_can_search_only_their_students(): void
+    {
+        $teacher1 = User::factory()->teacher()->create();
+        $teacher2 = User::factory()->teacher()->create();
+        $class1 = ClassGroup::factory()->create(['teacher_id' => $teacher1->id]);
+        $class2 = ClassGroup::factory()->create(['teacher_id' => $teacher2->id]);
+        $student1 = User::factory()->student()->create(['name' => 'John Doe', 'class_group_id' => $class1->id]);
+        $student2 = User::factory()->student()->create(['name' => 'John Smith', 'class_group_id' => $class2->id]);
+
+        $response = $this->actingAs($teacher1)->get('/admin/students-grade?search=John');
+
+        $response->assertStatus(200);
+        $response->assertSee('John Doe');
+        $response->assertDontSee('John Smith');
+    }
+
     // Note: Tests for POST/PUT/PATCH requests (approve/reject entries, assign teacher, create class)
     // require CSRF token handling which is not working in current test setup.
     // These features are tested manually and work correctly in the application.

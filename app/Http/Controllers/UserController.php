@@ -12,14 +12,30 @@ class UserController extends Controller
     /**
      * Display a listing of all users with their roles (Admin only)
      */
-    public function index()
+    public function index(Request $request)
     {
         // Only admin can access this page
         if (!auth()->user()->hasRole('admin')) {
             abort(403);
         }
 
-        $users = User::with('roles')->orderBy('created_at', 'desc')->get();
+        $query = User::with('roles');
+
+        // Search by name or email
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by role
+        if ($request->filled('role')) {
+            $query->role($request->role);
+        }
+
+        $users = $query->orderBy('created_at', 'desc')->get();
 
         return view('admin.users.index', compact('users'));
     }
@@ -137,18 +153,45 @@ class UserController extends Controller
     /**
      * Show all students for grade management (Admin/Teacher only)
      */
-    public function studentsForGrade()
+    public function studentsForGrade(Request $request)
     {
         if (!auth()->user()->hasAnyRole(['admin', 'teacher'])) {
             abort(403);
         }
 
-        $students = User::role('student')
-            ->with('classGroup')
-            ->orderBy('name')
-            ->get();
+        $query = User::role('student')->with('classGroup');
 
-        return view('admin.users.students-for-grade', compact('students'));
+        // Search by name or email
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by specific class if provided
+        if ($request->filled('class_group_id')) {
+            $query->where('class_group_id', $request->class_group_id);
+        }
+
+        // Teachers can only see students from their assigned classes
+        if (auth()->user()->hasRole('teacher')) {
+            $query->whereHas('classGroup', function($q) {
+                $q->where('teacher_id', auth()->id());
+            });
+        }
+
+        $students = $query->orderBy('name')->get();
+
+        // Get class groups for filter dropdown (only teacher's classes for teachers)
+        if (auth()->user()->hasRole('teacher')) {
+            $classGroups = ClassGroup::where('teacher_id', auth()->id())->get();
+        } else {
+            $classGroups = ClassGroup::all();
+        }
+
+        return view('admin.users.students-for-grade', compact('students', 'classGroups'));
     }
 
     /**
