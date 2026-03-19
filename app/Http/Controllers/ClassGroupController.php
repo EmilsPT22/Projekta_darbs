@@ -17,9 +17,25 @@ class ClassGroupController extends Controller
             abort(403);
         }
 
-        $classGroups = ClassGroup::withCount('students')->get();
+        $classGroups = ClassGroup::with(['teacher'])->withCount('students')->get();
 
         return view('classgroups.index', compact('classGroups'));
+    }
+
+    /**
+     * Show teachers and their assigned classes.
+     */
+    public function teachers()
+    {
+        if (!auth()->user()->hasRole('admin')) {
+            abort(403);
+        }
+
+        $teachers = User::whereHas('roles', function($q) {
+            $q->where('name', 'teacher');
+        })->with('classGroups.students')->get();
+
+        return view('admin.teachers', compact('teachers'));
     }
 
     /**
@@ -156,5 +172,25 @@ class ClassGroupController extends Controller
         ]);
 
         return back()->with('success', 'Students assigned to class successfully');
+    }
+
+    /**
+     * Assign a teacher to a class group.
+     */
+    public function assignTeacher(Request $request, ClassGroup $classgroup)
+    {
+        if (!auth()->user()->hasAnyRole(['admin', 'internship_manager'])) {
+            abort(403);
+        }
+
+        $request->validate([
+            'teacher_id' => 'nullable|exists:users,id',
+        ]);
+
+        $classgroup->update([
+            'teacher_id' => $request->teacher_id,
+        ]);
+
+        return back()->with('success', 'Teacher assigned to class successfully');
     }
 }

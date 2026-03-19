@@ -32,14 +32,6 @@
                     </form>
                 </div>
                 @endif
-
-                @if(auth()->user()->hasAnyRole(['admin', 'teacher']))
-                <div>
-                    <a href="{{ route('entries.index', $internship->id) }}" class="btn btn-success btn-sm">
-                        View Entries
-                    </a>
-                </div>
-                @endif
             </li>
         @endforeach
     </ul>

@@ -117,7 +117,7 @@ public function create(Internship $internship)
 
         $request->validate([
             'theme_id'     => 'required|exists:themes,id',
-            'date'         => 'required|date|after_or_equal:' . $internship->start_date . '|before_or_equal:' . $internship->end_date,
+            'date'         => 'required|date|after_or_equal:' . $internship->start_date->format('Y-m-d') . '|before_or_equal:' . $internship->end_date->format('Y-m-d'),
             'location'     => 'required|in:remote,on-site,mixed',
             'time_from'    => 'required|date_format:H:i',
             'time_to'      => 'required|date_format:H:i|after:time_from',
@@ -216,35 +216,30 @@ public function create(Internship $internship)
 
         if ($user->hasRole('admin')) {
             $request->validate([
-                'admin_comment' => 'nullable|string|max:1000',
                 'grade' => 'nullable|integer|min:1|max:10',
             ]);
 
             $entry->update([
-                'admin_comment' => $request->admin_comment,
                 'grade' => $request->grade,
             ]);
         } elseif ($user->hasRole('internship_manager')) {
-            // Internship manager can only change the grade
             $request->validate([
-                'grade' => 'required|integer|min:1|max:10',
+                'internship_manager_comment' => 'nullable|string|max:1000',
+                'grade' => 'nullable|integer|min:1|max:10',
             ]);
 
             $entry->update([
+                'internship_manager_comment' => $request->internship_manager_comment,
                 'grade' => $request->grade,
             ]);
         } elseif ($user->hasRole('teacher')) {
-            // Teachers can approve/reject entries with comment
+            // Teachers can add comment only
             $request->validate([
-                'status' => 'required|in:approved,rejected',
                 'org_supervisor_comment' => 'nullable|string|max:1000',
             ]);
 
             $entry->update([
-                'status' => $request->status,
                 'org_supervisor_comment' => $request->org_supervisor_comment,
-                'approved_by' => $user->id,
-                'approved_at' => now(),
             ]);
         } else {
             abort(403);

@@ -71,6 +71,11 @@ class User extends Authenticatable
         return $this->hasMany(ClassGroup::class, 'teacher_id');
     }
 
+    public function classGroups()
+    {
+        return $this->hasMany(ClassGroup::class, 'teacher_id');
+    }
+
     public function dailyEntries()
     {
         return $this->hasMany(DailyEntry::class);

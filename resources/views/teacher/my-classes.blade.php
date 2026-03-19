@@ -4,7 +4,7 @@
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">{{ auth()->user()->hasRole('admin') ? 'All Classes' : 'My Classes' }}</h2>
-        <a href="{{ route('dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+        <a href="{{ route('internships.index') }}" class="btn btn-secondary">Back to Internships</a>
     </div>
 
     <div class="card bg-dark border-secondary">

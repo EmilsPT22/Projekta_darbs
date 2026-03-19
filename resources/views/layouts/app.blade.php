@@ -30,6 +30,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('classgroups.index') }}">Classes</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('admin.students-grade') }}">Students</a>
+                    </li>
                     @endif
                     @if(auth()->user()->hasRole('teacher'))
                     <li class="nav-item dropdown">
@@ -40,11 +43,6 @@
                             <li><a class="dropdown-item" href="{{ route('teacher.my-classes') }}">My Classes</a></li>
                             <li><a class="dropdown-item" href="{{ route('teacher.my-students') }}">My Students</a></li>
                         </ul>
-                    </li>
-                    @endif
-                    @if(auth()->user()->hasAnyRole(['admin', 'teacher']))
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('admin.students-grade') }}">Manage Classes</a>
                     </li>
                     @endif
                     <li class="nav-item">

@@ -5,7 +5,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="mb-0">Calendar - {{ $internship->name }} - {{ $student->name }}</h2>
         <div>
-            <a href="{{ route('entries.student', ['internship' => $internship->id, 'student' => $student->id]) }}" class="btn btn-secondary btn-sm">
+            <a href="{{ route('entries.index', ['internship' => $internship->id]) }}" class="btn btn-secondary btn-sm">
                 List View
             </a>
             @if(auth()->user()->hasRole('student'))
@@ -40,8 +40,11 @@
                         location: '{{ $entry->location }}',
                         duration: '{{ $entry->duration }}',
                         comment: '{{ $entry->intern_comment ?? "No comment" }}',
-                        @if($entry->admin_comment)
-                        adminComment: '{{ $entry->admin_comment }}',
+                        @if($entry->org_supervisor_comment)
+                        teacherComment: '{{ $entry->org_supervisor_comment }}',
+                        @endif
+                        @if($entry->internship_manager_comment)
+                        managerComment: '{{ $entry->internship_manager_comment }}',
                         grade: {{ $entry->grade ?? 'null' }},
                         @endif
                     }
@@ -74,7 +77,8 @@
                                     <p><strong>Location:</strong> ${props.location}</p>
                                     <p><strong>Duration:</strong> ${props.duration}</p>
                                     <p><strong>Comment:</strong> ${props.comment}</p>
-                                    ${props.adminComment ? `<p><strong>Admin Comment:</strong> ${props.adminComment}</p>` : ''}
+                                    ${props.teacherComment ? `<p><strong>Teacher Comment:</strong> ${props.teacherComment}</p>` : ''}
+                                    ${props.managerComment ? `<p><strong>Manager Comment:</strong> ${props.managerComment}</p>` : ''}
                                     ${props.grade ? `<p><strong>Grade:</strong> ${props.grade}/10</p>` : ''}
                                 </div>
                                 <div class="modal-footer">

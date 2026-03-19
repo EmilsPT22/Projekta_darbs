@@ -120,14 +120,12 @@ class DailyEntryTest extends TestCase
         ]);
 
         $response = $this->actingAs($admin)->patch("/internships/{$internship->id}/entries/{$entry->id}", [
-            'admin_comment' => 'Good work!',
             'grade' => 8,
         ]);
 
         $response->assertRedirect();
         $this->assertDatabaseHas('daily_entries', [
             'id' => $entry->id,
-            'admin_comment' => 'Good work!',
             'grade' => 8,
         ]);
     }

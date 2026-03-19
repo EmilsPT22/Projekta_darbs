@@ -13,10 +13,6 @@ Route::get('/', function () {
     return view('home');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('internships', InternshipController::class);
 
@@ -50,6 +46,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('classgroups', ClassGroupController::class);
         Route::post('classgroups/{classgroup}/assign-students', [ClassGroupController::class, 'assignStudents'])
             ->name('classgroups.assign-students');
+        Route::post('classgroups/{classgroup}/assign-teacher', [ClassGroupController::class, 'assignTeacher'])
+            ->name('classgroups.assign-teacher');
+        Route::get('/teachers', [ClassGroupController::class, 'teachers'])->name('admin.teachers');
     });
 
     // Teacher routes

@@ -28,7 +28,8 @@
                         <th>Location</th>
                         <th>Hours</th>
                         <th>Intern Comment</th>
-                        <th>Admin Comment</th>
+                        <th>Teacher Comment</th>
+                        <th>Manager Comment</th>
                         <th>Grade</th>
                         <th>Actions</th>
                     </tr>
@@ -44,8 +45,15 @@
                             <td>{{ $entry->credit_hours }}</td>
                             <td>{{ $entry->intern_comment ?? '-' }}</td>
                             <td>
-                                @if($entry->admin_comment)
-                                    <small>{{ Str::limit($entry->admin_comment, 50) }}</small>
+                                @if($entry->org_supervisor_comment)
+                                    <small>{{ Str::limit($entry->org_supervisor_comment, 50) }}</small>
+                                @else
+                                    <span class="text-muted">No comment</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($entry->internship_manager_comment)
+                                    <small>{{ Str::limit($entry->internship_manager_comment, 50) }}</small>
                                 @else
                                     <span class="text-muted">No comment</span>
                                 @endif

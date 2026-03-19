@@ -21,7 +21,7 @@ class DailyEntry extends Model
         'credit_hours',
         'intern_comment',
         'org_supervisor_comment',
-        'admin_comment',
+        'internship_manager_comment',
         'grade',
         'status',
         'approved_by',

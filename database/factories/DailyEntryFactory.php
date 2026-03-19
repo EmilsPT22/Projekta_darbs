@@ -32,7 +32,7 @@ class DailyEntryFactory extends Factory
             'credit_hours' => 4,
             'intern_comment' => null,
             'org_supervisor_comment' => null,
-            'admin_comment' => null,
+            'internship_manager_comment' => null,
             'grade' => null,
         ];
     }

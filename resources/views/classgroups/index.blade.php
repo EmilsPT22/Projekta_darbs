@@ -36,24 +36,51 @@
                         <div class="card-body">
                             <p class="card-text">{{ $classGroup->description ?? 'No description' }}</p>
                             <p class="text-muted"><strong>Grade Level:</strong> {{ $classGroup->grade_level }}</p>
+                            <p class="text-muted">
+                                <strong>Teacher:</strong>
+                                @if($classGroup->teacher)
+                                    <span class="text-info">{{ $classGroup->teacher->name }}</span>
+                                @else
+                                    <span class="text-warning">No teacher assigned</span>
+                                @endif
+                            </p>
                         </div>
                         <div class="card-footer border-secondary">
-                            <a href="{{ route('classgroups.show', $classGroup) }}" class="btn btn-sm btn-info">
-                                View Students
-                            </a>
-                            @if(auth()->user()->hasAnyRole(['admin', 'internship_manager']))
-                                <a href="{{ route('classgroups.edit', $classGroup) }}" class="btn btn-sm btn-warning">
-                                    Edit
-                                </a>
-                                <form action="{{ route('classgroups.destroy', $classGroup) }}" method="POST" class="d-inline">
+                            <div class="d-flex flex-column gap-2">
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <a href="{{ route('classgroups.show', $classGroup) }}" class="btn btn-sm btn-info">
+                                        View Students
+                                    </a>
+                                    @if(auth()->user()->hasAnyRole(['admin', 'internship_manager']))
+                                        <a href="{{ route('classgroups.edit', $classGroup) }}" class="btn btn-sm btn-warning">
+                                            Edit
+                                        </a>
+                                        <form action="{{ route('classgroups.destroy', $classGroup) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger"
+                                                    onclick="return confirm('Delete this class group? Students will not be deleted.')">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                                
+                                @if(auth()->user()->hasAnyRole(['admin', 'internship_manager']))
+                                <form action="{{ route('classgroups.assign-teacher', $classGroup) }}" method="POST" class="d-flex gap-2">
                                     @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" 
-                                            onclick="return confirm('Delete this class group? Students will not be deleted.')">
-                                        Delete
-                                    </button>
+                                    <select name="teacher_id" class="form-select form-select-sm" style="width: 200px;">
+                                        <option value="">-- Assign Teacher --</option>
+                                        @foreach(\App\Models\User::role('teacher')->orderBy('name')->get() as $teacher)
+                                            <option value="{{ $teacher->id }}" {{ $classGroup->teacher_id == $teacher->id ? 'selected' : '' }}>
+                                                {{ $teacher->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-primary">Assign</button>
                                 </form>
-                            @endif
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>

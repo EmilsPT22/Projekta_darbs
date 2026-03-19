@@ -34,15 +34,12 @@
                     <th>Plan</th>
                     <th>Location</th>
                     <th>Hours</th>
-                    <th>Status</th>
                     <th>Intern Comment</th>
+                    <th>Teacher Comment</th>
+                    <th>Manager Comment</th>
+                    <th>Grade</th>
                     @if(auth()->user()->hasAnyRole(['admin', 'internship_manager', 'teacher']))
-                        <th>Teacher Comment</th>
-                        <th>Admin Comment</th>
-                        <th>Grade</th>
-                        @if(auth()->user()->hasAnyRole(['admin', 'internship_manager', 'teacher']))
-                            <th>Actions</th>
-                        @endif
+                        <th>Actions</th>
                     @endif
                 </tr>
             </thead>
@@ -59,40 +56,30 @@
                             <span class="badge bg-info">{{ $entry->location }}</span>
                         </td>
                         <td>{{ $entry->credit_hours }}</td>
+                        <td>{{ $entry->intern_comment ?? '-' }}</td>
                         <td>
-                            @if($entry->status === 'approved')
-                                <span class="badge bg-success">Approved</span>
-                            @elseif($entry->status === 'rejected')
-                                <span class="badge bg-danger">Rejected</span>
+                            @if($entry->org_supervisor_comment)
+                                <small>{{ Str::limit($entry->org_supervisor_comment, 50) }}</small>
                             @else
-                                <span class="badge bg-warning text-dark">Pending</span>
+                                <span class="text-muted">No comment</span>
                             @endif
                         </td>
-                        <td>{{ $entry->intern_comment ?? '-' }}</td>
+                        <td>
+                            @if($entry->internship_manager_comment)
+                                <small>{{ Str::limit($entry->internship_manager_comment, 50) }}</small>
+                            @else
+                                <span class="text-muted">No comment</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if($entry->grade)
+                                <span class="badge bg-primary">{{ $entry->grade }}/10</span>
+                            @else
+                                <span class="text-muted">-</span>
+                            @endif
+                        </td>
 
                         @if(auth()->user()->hasAnyRole(['admin', 'internship_manager', 'teacher']))
-                            <td>
-                                @if($entry->org_supervisor_comment)
-                                    <small>{{ Str::limit($entry->org_supervisor_comment, 50) }}</small>
-                                @else
-                                    <span class="text-muted">No comment</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if($entry->admin_comment)
-                                    <small>{{ Str::limit($entry->admin_comment, 50) }}</small>
-                                @else
-                                    <span class="text-muted">No comment</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if($entry->grade)
-                                    <span class="badge bg-primary">{{ $entry->grade }}/10</span>
-                                @else
-                                    <span class="text-muted">-</span>
-                                @endif
-                            </td>
-                            @if(auth()->user()->hasAnyRole(['admin', 'internship_manager', 'teacher']))
                             <td>
                                 <a href="{{ route('entries.edit', [$internship->id, $entry->id]) }}" class="btn btn-warning btn-sm">
                                     @if(auth()->user()->hasRole('admin'))
@@ -102,12 +89,11 @@
                                     @endif
                                 </a>
                             </td>
-                            @endif
                         @endif
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ auth()->user()->hasAnyRole(['admin', 'internship_manager', 'teacher']) ? '8' : '5' }}" class="text-center text-muted py-4">
+                        <td colspan="{{ auth()->user()->hasAnyRole(['admin', 'internship_manager', 'teacher']) ? '9' : '8' }}" class="text-center text-muted py-4">
                             No entries yet
                         </td>
                     </tr>

@@ -17,6 +17,11 @@ class Internship extends Model
         'end_date',
     ];
 
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
+    ];
+
     public function students()
     {
         return $this->belongsToMany(User::class);
