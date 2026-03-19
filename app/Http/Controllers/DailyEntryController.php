@@ -6,10 +6,12 @@ use App\Models\DailyEntry;
 use App\Models\Internship;
 use App\Models\Theme;
 use App\Models\User;
+use App\Traits\LogsActivity;
 use Illuminate\Http\Request;
 
 class DailyEntryController extends Controller
 {
+    use LogsActivity;
     public function index(Internship $internship)
     {
         $user = auth()->user();
@@ -172,6 +174,13 @@ public function create(Internship $internship)
             'used_hours' => $pivot->used_hours + $request->credit_hours,
         ]);
 
+        $this->logActivity(
+            'entry_created',
+            "Student {$user->name} added a daily entry for {$internship->name} ({$request->credit_hours} hours)",
+            null,
+            ['internship_id' => $internship->id, 'credit_hours' => $request->credit_hours]
+        );
+
         return redirect()->route('entries.index', $internship->id)
             ->with('success', 'Entry added successfully');
     }
@@ -222,6 +231,13 @@ public function create(Internship $internship)
             $entry->update([
                 'grade' => $request->grade,
             ]);
+
+            $this->logActivity(
+                'entry_graded',
+                "Admin {$user->name} graded entry #{$entry->id} with {$request->grade}/10",
+                $entry,
+                ['grade' => $request->grade]
+            );
         } elseif ($user->hasRole('internship_manager')) {
             $request->validate([
                 'internship_manager_comment' => 'nullable|string|max:1000',
@@ -232,6 +248,13 @@ public function create(Internship $internship)
                 'internship_manager_comment' => $request->internship_manager_comment,
                 'grade' => $request->grade,
             ]);
+
+            $this->logActivity(
+                'entry_graded',
+                "Internship Manager {$user->name} added comment and grade {$request->grade}/10 to entry #{$entry->id}",
+                $entry,
+                ['grade' => $request->grade, 'comment' => $request->internship_manager_comment]
+            );
         } elseif ($user->hasRole('teacher')) {
             // Teachers can add comment only
             $request->validate([
@@ -241,6 +264,12 @@ public function create(Internship $internship)
             $entry->update([
                 'org_supervisor_comment' => $request->org_supervisor_comment,
             ]);
+
+            $this->logActivity(
+                'entry_commented',
+                "Teacher {$user->name} added a comment to entry #{$entry->id}",
+                $entry
+            );
         } else {
             abort(403);
         }

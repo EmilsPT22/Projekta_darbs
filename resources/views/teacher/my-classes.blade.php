@@ -4,7 +4,14 @@
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">{{ auth()->user()->hasRole('admin') ? 'All Classes' : 'My Classes' }}</h2>
-        <a href="{{ route('internships.index') }}" class="btn btn-secondary">Back to Internships</a>
+        <div>
+            @if(auth()->user()->hasRole('teacher'))
+                <a href="{{ route('teacher.manage-students') }}" class="btn btn-primary me-2">
+                    Manage Students
+                </a>
+            @endif
+            <a href="{{ route('internships.index') }}" class="btn btn-secondary">Back to Internships</a>
+        </div>
     </div>
 
     <div class="card bg-dark border-secondary">

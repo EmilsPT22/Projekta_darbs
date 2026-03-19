@@ -2,7 +2,15 @@
 
 @section('content')
 <div class="container py-4">
-    <h1 class="mb-4">Class/Grade Management</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Class/Grade Management</h2>
+        <div>
+            @if(auth()->user()->hasRole('admin'))
+                <a href="{{ route('classgroups.create') }}" class="btn btn-primary me-2">Create New Class</a>
+            @endif
+            <a href="{{ route('internships.index') }}" class="btn btn-secondary">Back to Internships</a>
+        </div>
+    </div>
 
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -11,19 +19,8 @@
         </div>
     @endif
 
-    <div class="mb-4">
-        <a href="{{ route('classgroups.create') }}" class="btn btn-primary">
-            Create New Class
-        </a>
-        <a href="{{ route('internships.index') }}" class="btn btn-secondary ms-2">
-            Back to Internships
-        </a>
-    </div>
-
     @if($classGroups->isEmpty())
-        <div class="alert alert-info">
-            No class groups created yet. Create your first class to organize students.
-        </div>
+        <div class="alert alert-info">No class groups created yet. Create your first class to organize students.</div>
     @else
         <div class="row">
             @foreach($classGroups as $classGroup)
@@ -51,7 +48,7 @@
                                     <a href="{{ route('classgroups.show', $classGroup) }}" class="btn btn-sm btn-info">
                                         View Students
                                     </a>
-                                    @if(auth()->user()->hasAnyRole(['admin', 'internship_manager']))
+                                    @if(auth()->user()->hasRole('admin'))
                                         <a href="{{ route('classgroups.edit', $classGroup) }}" class="btn btn-sm btn-warning">
                                             Edit
                                         </a>
@@ -65,8 +62,8 @@
                                         </form>
                                     @endif
                                 </div>
-                                
-                                @if(auth()->user()->hasAnyRole(['admin', 'internship_manager']))
+
+                                @if(auth()->user()->hasRole('admin'))
                                 <form action="{{ route('classgroups.assign-teacher', $classGroup) }}" method="POST" class="d-flex gap-2">
                                     @csrf
                                     <select name="teacher_id" class="form-select form-select-sm" style="width: 200px;">

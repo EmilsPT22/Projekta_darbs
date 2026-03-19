@@ -1,15 +1,19 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h1 class="mb-4">Internships</h1>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Internships</h2>
+        @if(auth()->user()->hasAnyRole(['admin', 'internship_manager']))
+            <a href="{{ route('internships.create') }}" class="btn btn-primary">Create Internship</a>
+        @endif
+    </div>
 
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
-    @if(auth()->user()->hasAnyRole(['admin', 'internship_manager']))
-        <a href="{{ route('internships.create') }}" class="btn btn-primary mb-3">Create Internship</a>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+        </div>
     @endif
 
     @if($internships->isEmpty())
@@ -57,9 +61,4 @@
         </div>
     @endif
 </div>
-@endsection
-
-@section('scripts')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 @endsection

@@ -49,12 +49,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('classgroups/{classgroup}/assign-teacher', [ClassGroupController::class, 'assignTeacher'])
             ->name('classgroups.assign-teacher');
         Route::get('/teachers', [ClassGroupController::class, 'teachers'])->name('admin.teachers');
+        Route::get('/activity-log', [ClassGroupController::class, 'activityLog'])->name('admin.activity-log');
     });
 
     // Teacher routes
     Route::prefix('teacher')->group(function () {
         Route::get('/my-classes', [ClassGroupController::class, 'myClasses'])->name('teacher.my-classes');
         Route::get('/my-students', [UserController::class, 'myStudents'])->name('teacher.my-students');
+        Route::get('/manage-students', [ClassGroupController::class, 'manageStudents'])->name('teacher.manage-students');
     });
 
     Route::prefix('internships/{internship}')->group(function () {
