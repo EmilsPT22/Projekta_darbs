@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Internship;
 use App\Models\InternshipApplication;
+use App\Notifications\NewApplicationNotification;
+use App\Notifications\ApplicationStatusChangedNotification;
 use Illuminate\Http\Request;
 
 class InternshipApplicationController extends Controller
@@ -60,7 +62,7 @@ class InternshipApplicationController extends Controller
             'phone' => 'nullable|string|max:20',
         ]);
 
-        InternshipApplication::create([
+        $application = InternshipApplication::create([
             'internship_id' => $internship->id,
             'user_id' => auth()->id(),
             'cover_letter' => $request->cover_letter,
@@ -68,6 +70,18 @@ class InternshipApplicationController extends Controller
             'phone' => $request->phone,
             'status' => 'pending',
         ]);
+
+        // Notify internship manager about new application
+        $internshipManager = \App\Models\User::role('internship_manager')->first();
+        if ($internshipManager) {
+            $internshipManager->notify(new NewApplicationNotification($application));
+        }
+
+        // Also notify all admins
+        $admins = \App\Models\User::role('admin')->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new NewApplicationNotification($application));
+        }
 
         return redirect()->route('internships.show', $internship->id)
             ->with('success', 'Your application has been submitted successfully!');
@@ -118,6 +132,7 @@ class InternshipApplicationController extends Controller
                 ->with('error', 'Student is already enrolled in another internship: ' . $existingInternship->name);
         }
 
+        $oldStatus = $application->status;
         $application->update([
             'status' => 'approved',
             'manager_comment' => request('manager_comment'),
@@ -135,6 +150,11 @@ class InternshipApplicationController extends Controller
             ]);
         }
 
+        // Notify student about approval
+        $application->student->notify(
+            new ApplicationStatusChangedNotification($application, $oldStatus, 'approved')
+        );
+
         return redirect()->route('applications.index', $internship->id)
             ->with('success', 'Application approved. Student added to internship.');
     }
@@ -148,10 +168,16 @@ class InternshipApplicationController extends Controller
             abort(403);
         }
 
+        $oldStatus = $application->status;
         $application->update([
             'status' => 'rejected',
             'manager_comment' => request('manager_comment'),
         ]);
+
+        // Notify student about rejection
+        $application->student->notify(
+            new ApplicationStatusChangedNotification($application, $oldStatus, 'rejected')
+        );
 
         return redirect()->route('applications.index', $internship->id)
             ->with('success', 'Application rejected.');

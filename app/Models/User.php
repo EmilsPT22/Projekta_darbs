@@ -80,4 +80,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(DailyEntry::class);
     }
+
+    public function unreadNotifications()
+    {
+        return $this->notifications()->whereNull('read_at');
+    }
+
+    public function unreadNotificationCount()
+    {
+        return $this->unreadNotifications()->count();
+    }
 }

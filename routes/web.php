@@ -7,6 +7,7 @@ use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\InternshipApplicationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ClassGroupController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -30,6 +31,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile/password', function () {
         return view('profile.password');
         })->name('profile.password');
+
+    // Notification routes
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
+        Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+        Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+        Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    });
 
     // Admin only routes
     Route::prefix('admin')->group(function () {
