@@ -56,6 +56,22 @@ class InternshipApplicationController extends Controller
                 ->with('error', 'You are already enrolled in an internship: ' . $existingInternship->name);
         }
 
+        // Check if student already applied to this internship
+        $existingApplication = InternshipApplication::where('internship_id', $internship->id)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if ($existingApplication) {
+            return redirect()->route('internships.show', $internship->id)
+                ->with('error', 'You have already applied to this internship.');
+        }
+
+        // Check if student is already enrolled in this internship
+        if ($internship->students->contains(auth()->id())) {
+            return redirect()->route('internships.show', $internship->id)
+                ->with('error', 'You are already enrolled in this internship.');
+        }
+
         $request->validate([
             'cover_letter' => 'nullable|string|max:2000',
             'motivation' => 'required|string|max:2000',
